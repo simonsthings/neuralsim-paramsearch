@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/datafig" />
+      <excludeFolder url="file://$MODULE_DIR$/old" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon1.data" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon1.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon1_old.data" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon2.data" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon2.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon3.data" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon3.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon4.data" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon4.data_old" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon4.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.data" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.data_lpru" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.figures 2" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.figures 3" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.figures 4" />
+      <excludeFolder url="file://$MODULE_DIR$/sim_simon5.figures_lpru" />
+      <excludeFolder url="file://$MODULE_DIR$/test_Izhikevich2003Group.data" />
+      <excludeFolder url="file://$MODULE_DIR$/test_Izhikevich2003Group.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/test_Izhikevich2007Group.data" />
+      <excludeFolder url="file://$MODULE_DIR$/test_Izhikevich2007Group.figures" />
+      <excludeFolder url="file://$MODULE_DIR$/test_IzhikevichGroup.data" />
+      <excludeFolder url="file://$MODULE_DIR$/test_IzhikevichGroup.figures" />
+    </content>
+    <content url="file://$USER_HOME$/Workspaces/WorkspacePyCharm/SimonsPythonHelpers" />
+    <orderEntry type="jdk" jdkName="Python 2.7.11 (/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/bin/python2.7)" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+  </component>
+</module>
