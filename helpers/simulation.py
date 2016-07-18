@@ -4,7 +4,10 @@ import json
 #from SimonsPythonHelpers import nestedPrint
 
 
-def run_simulation(allsimparams ,metaparams ,wetRun=True):
+def run_simulation(params ,wetRun=True):
+    allsimparams = params.allsimparams
+    metaparams = params.metaparams
+
     os.system( 'mkdir -p ' +metaparams.data_path)
     os.chdir(metaparams.data_path)
 
@@ -72,21 +75,23 @@ def run_simulation(allsimparams ,metaparams ,wetRun=True):
 
     parjobfile.close()
 
-    if numParameterSets > 1:
-        print "Now running sims for " \
-              + str(numParameterSets) \
-              + " parameter sets with " \
-              + str(metaparams.numRepetitions) \
-              + " repetitions each (" + str(numParameterSets * metaparams.numRepetitions) \
-              + " parallel jobs). Screen output redirected to stdout.txt and stderr.txt to avoid terminal confusion."
-    else:
-        print "Now running sims for " \
-              + str(numParameterSets) \
-              + " parameter sets with " \
-              + str(metaparams.numRepetitions) \
-              + " repetitions each (" \
+    summaryText = "Now running " \
               + str(numParameterSets * metaparams.numRepetitions) \
-              + " parallel jobs). Showing screen output here."
+              + " parallel jobs, consisting of " \
+              + str(numParameterSets) \
+              + " parameter sets with " \
+              + str(metaparams.numRepetitions) \
+              + " repetitions each."
+
+    if numParameterSets > 1:
+        print summaryText + " Screen output redirected to stdout.txt and stderr.txt to avoid terminal confusion."
+    else:
+        print summaryText + " Showing screen output here."
+
+    print "There are " +str(len(params.flatParamLists.keys()))+" parameter sets to be evaluated:"
+    for flatParamString in params.flatParamLists.keys():
+        paramList = params.flatParamLists[flatParamString]
+        print '- ' + flatParamString + ': ' + str(len(paramList)) + ' values'
 
     if wetRun:
         gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog.txt :::: par_jobs.txt"

@@ -1,14 +1,15 @@
 import os
 import numpy as np
 import dotmap
+from SimonsPythonHelpers import nestedPrint
 
-from helpers.parameters import flattenExtendParamsets, crossAllParamsets
+from helpers.parameters import flattenExtendedParamsets, crossAllParamsets
 from helpers.simulation import run_simulation
 
-from figures.overview import make_overview_figures
+#from figures.figuretype_OneParamAndRepetitions_Accuracy import makeFig
 from figures.repetitiondetail import make_singlerun_figures
 from figures.repetitionsummary import make_repetitionsummary_figures
-
+import figures
 
 def define_extended_simulation_parameters(metaparams,baseParams):
     """
@@ -17,15 +18,15 @@ def define_extended_simulation_parameters(metaparams,baseParams):
     """
 
     extendedParams = dotmap.DotMap()
-    extendedParams.neurongroups.outputs.userecovery = [True,False]
-    extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
+    #extendedParams.neurongroups.outputs.userecovery = [True,False]
+    #extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
     #extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
-    #extendedParams.neurongroups.outputs.projMult = np.r_[0.2:2.2:0.2]
+    extendedParams.neurongroups.outputs.projMult = np.r_[0.2:2.2:0.2]
     #extendedParams.neurongroups.outputs.projMult = np.r_[2.2:4.2:0.2]
-    extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
+    #extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 
-    extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([1/1.0 , 2.0]) # eta in Auryn
-    #extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
+    extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
+    ##extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
 
     return extendedParams
 
@@ -153,10 +154,9 @@ def define_meta_parameters():
 
 
 def make_figures(allsimparams ,metaparams):
-
     os.system( 'mkdir -p ' +metaparams.figures_path)
 
-    make_overview_figures(allsimparams ,metaparams)
+    figures.makeFiguretype_OneParamAndRepetitions_Accuracy(allsimparams, metaparams)
 
     if allsimparams[0].recordings.detailedtracking:
         make_repetitionsummary_figures(allsimparams ,metaparams)
@@ -166,33 +166,42 @@ def make_figures(allsimparams ,metaparams):
 
 
 def main():
-    
+    params = dotmap.DotMap()
+
     #### Define meta settings: executable, etc... ####
-    metaparams = define_meta_parameters()
+    params.metaparams = define_meta_parameters()
 
     ##### Define simulation settings: ####
-    baseParams = define_base_simulation_parameters(metaparams)
-    extendedParams = define_extended_simulation_parameters(metaparams,baseParams)
+    params.baseParams = define_base_simulation_parameters(params.metaparams)
+    params.extendedParams = define_extended_simulation_parameters(params.metaparams,params.baseParams)
 
-    stringIndexedParamsLists = flattenExtendParamsets(metaparams, baseParams, extendedParams)
-    #nestedPrint(allsimparams)
-    #nestedPrint(stringIndexedParamsLists)
-    allsimparams = crossAllParamsets(metaparams, baseParams, stringIndexedParamsLists)
+    ##### Rearrange them: #####
+    params.flatParamLists = flattenExtendedParamsets(params.metaparams, params.baseParams, params.extendedParams)
+    params.allsimparams = crossAllParamsets(params.baseParams, params.flatParamLists.copy())
     #nestedPrint(allsimparams)
 
-    #for repetitionID in xrange(metaparams.numRepetitions):
-    #    oneSimParams = define_base_simulation_parameters(metaparams)
-    #    allsimparams.append(oneSimParams)
-    #nestedPrint(allsimparams)
-        
+
     ##### Run simulation(s) #####
-    run_simulation(allsimparams, metaparams, True)
-    #print (allsimparams[0].extendedparamFoldername)
+    run_simulation(params, True)
 
 
     ##### Plot results #####
-    make_figures(allsimparams,metaparams)
+    try:
+        #figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
+        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params,paramString='neurongroups.outputs.projMult')
+        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params,paramString='connectionsets.con1.stdprule.learningrate')
 
+
+        if params.baseParams.recordings.detailedtracking:
+            #figures.makeFiguretype_OneParamAndRepetitions_ResponseDevelopment(params,paramString='neurongroups.outputs.projMult')
+            pass
+
+        #make_figures(allsimparams,metaparams)
+
+    except IOError as e:
+        print e.message
+        print e
+        print type(e)
 
 
 if __name__ == "__main__":
