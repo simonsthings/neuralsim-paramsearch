@@ -18,14 +18,14 @@ def define_extended_simulation_parameters(metaparams,baseParams):
     """
 
     extendedParams = dotmap.DotMap()
-    #extendedParams.neurongroups.outputs.userecovery = [True,False]
+    extendedParams.neurongroups.outputs.userecovery = [True,False]
     #extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
-    #extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
-    extendedParams.neurongroups.outputs.projMult = np.r_[0.2:2.2:0.2]
+    extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
+    #extendedParams.neurongroups.outputs.projMult = np.r_[0.2:2.2:0.2]
     #extendedParams.neurongroups.outputs.projMult = np.r_[2.2:4.2:0.2]
     #extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 
-    extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
+    #extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
     ##extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
 
     return extendedParams
@@ -41,8 +41,8 @@ def define_base_simulation_parameters(metaparams):
     #simparams.general.testingProtocol_durations = [300,300,900] # in seconds
     #simparams.general.testingProtocol_phasetypes = [0,1,3] # 0=noise, 1=patterns, 2=test type A, 3=test type B, ...
     simparams.general.simtime = sum(simparams.general.testingProtocol_durations)
-    detailedtracking = False
-    
+    simparams.recordings.detailedtracking = True
+
     simparams.neurongroups.inputs.N = 2000
     
     #simparams.neurongroups.inputs.type = "PoissonGroup"
@@ -72,24 +72,14 @@ def define_base_simulation_parameters(metaparams):
 
 
     # Things to test:
-    # projMult ; input rate ; learningrate ; (STDP shape) ; (use_recovery) ; (dt) ; ...
+    # projMult ; maxW ; learningrate ; input rate ; (STDP shape) ; (use_recovery) ; (dt) ; ...
 
 
-    ## without recovery: best is projMult=0.8 with learningrate * 2
-    # projMult = 0.5 * ms/dt; // without recovery: learning works (*2), but then the neuron hardly ever manages to produce a spike!
-    # projMult = 0.8 * ms/dt; // 8.0; without recov: one-spike responses already at lr/1 ! But 2/6 do not learn within 400s. /2 seems to work more often than not, but always only after 400s. *2 surprisingly also works nicely! surprisingly well! best!  *4 doesn't work. *3 hardly ever works.
-    # projMult = 1.0 * ms/dt; // 8.0;  // without recovery: works for lr 1 with double spike. lr/2 looses 2nd spike :) (but takes longer than 400s to start sometimes, on /3 is takes more than 1600s often.)
-    # projMult = 1.5 * ms/dt; // 8.0;  // without recovery: only works for learningrate between /1 and /3
-
-    ## with recovery:
-    # projMult = 1.5 * ms/dt; // 8.0;  // with recovery! works with learningrate /4 to *10 and beyond.
-    # projMult = 50.5 * ms/dt; // 8.0;
-    
-    
     simparams.connectionsets.con1.presynaptic = "inputs"
     simparams.connectionsets.con1.postsynaptic = "outputs"
     simparams.connectionsets.con1.initialweight = 0.85
-    
+    simparams.connectionsets.con1.maximumweight = 1.0
+
 #     simparams.connectionsets.con1.stdprule.A_plus = 0.588
 #     simparams.connectionsets.con1.stdprule.A_minus = -1
 #     simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
@@ -105,7 +95,6 @@ def define_base_simulation_parameters(metaparams):
 
     
     recordingparams = simparams.recordings
-    recordingparams.detailedtracking = detailedtracking
     recordingparams.inputs.samplinginterval_poprate = 0.1 # seconds
     recordingparams.outputs.samplinginterval_rate = 0.1 # seconds
     recordingparams.outputs.samplinginterval_membranes = 'dt' # seconds
@@ -147,22 +136,34 @@ def define_meta_parameters():
     metaparams.data_basename = 'simon5'
     metaparams.figures_path = './datafig/'+metaparams.executable_file+'.figures/'
     metaparams.figures_basename = metaparams.data_basename
-    metaparams.numRepetitions = 8
+    metaparams.numRepetitions = 1
     for repetitionID in xrange(metaparams.numRepetitions):
         metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
     return metaparams
 
 
-def make_figures(allsimparams ,metaparams):
-    os.system( 'mkdir -p ' +metaparams.figures_path)
+def make_figures(params):
+    try:
 
-    figures.makeFiguretype_OneParamAndRepetitions_Accuracy(allsimparams, metaparams)
+        os.system( 'mkdir -p ' +params.metaparams.figures_path)
 
-    if allsimparams[0].recordings.detailedtracking:
-        make_repetitionsummary_figures(allsimparams ,metaparams)
+        # figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
+        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='neurongroups.outputs.projMult')
+        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='connectionsets.con1.stdprule.learningrate')
 
-        # if metaparams.numRepetitions < 5:
-        make_singlerun_figures(allsimparams ,metaparams)
+
+        if params.baseParams.recordings.detailedtracking:
+            make_repetitionsummary_figures(params.allsimparams,params.metaparams)
+
+            # if metaparams.numRepetitions < 5:
+            make_singlerun_figures(params.allsimparams,params.metaparams)
+
+
+    except IOError as e:
+        print e.message
+        print e
+        print type(e)
+
 
 
 def main():
@@ -182,26 +183,12 @@ def main():
 
 
     ##### Run simulation(s) #####
-    run_simulation(params, True)
+    run_simulation(params, False)
 
 
     ##### Plot results #####
-    try:
-        #figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
-        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params,paramString='neurongroups.outputs.projMult')
-        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params,paramString='connectionsets.con1.stdprule.learningrate')
+    make_figures(params)
 
-
-        if params.baseParams.recordings.detailedtracking:
-            #figures.makeFiguretype_OneParamAndRepetitions_ResponseDevelopment(params,paramString='neurongroups.outputs.projMult')
-            pass
-
-        #make_figures(allsimparams,metaparams)
-
-    except IOError as e:
-        print e.message
-        print e
-        print type(e)
 
 
 if __name__ == "__main__":

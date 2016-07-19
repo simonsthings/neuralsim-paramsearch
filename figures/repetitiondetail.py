@@ -10,15 +10,15 @@ def make_singlerun_figures(allsimparams, metaparams):
     axesdims = dotmap.DotMap()
     axesdims.figSpikes.x = 0.1
     axesdims.figSpikes.w = 0.85
-    axesdims.figSpikes.y1 = 0.75  # input raster
+    axesdims.figSpikes.y1 = 0.75 # input raster
     axesdims.figSpikes.h1 = 0.2  # input raster
-    axesdims.figSpikes.y2 = 0.25  # membranes
+    axesdims.figSpikes.y2 = 0.25 # membranes
     axesdims.figSpikes.h2 = 0.1  # membranes
     axesdims.figSpikes.y3 = 0.1  # output raster
-    axesdims.figSpikes.h3 = 0.05  # output rater
+    axesdims.figSpikes.h3 = 0.05 # output rater
     axesdims.figSpikes.y4 = 0.4  # ampa
     axesdims.figSpikes.h4 = 0.1  # ampa
-    axesdims.figSpikes.y5 = 0.55  # nmda
+    axesdims.figSpikes.y5 = 0.55 # nmda
     axesdims.figSpikes.h5 = 0.1  # nmda
 
     axesdims.figWeights.x1 = 0.1
@@ -105,7 +105,7 @@ def make_singleruns_html(allsimparams, metaparams, imagename):
     # write column headers:
     htmlfile.write('<tr><th></th> \n')
     for simparams in allsimparams:
-        htmlfile.write('<th>' + simparams.extendedparamFoldername + '</th> \n')
+        htmlfile.write('<th>' + simparams.extendedparamFoldername.replace('_',' ') + '</th> \n')
     htmlfile.write('</tr> \n')
 
     for repetitionID in xrange(metaparams.numRepetitions):
@@ -413,7 +413,7 @@ def plotOutputrate(axesdims, simparams, datafile_basename, timespan=None):
     # print "The Y lim: " + str(theYlim)
     scaledata = simdata['rate'][indexes]
     scalestart_at_second = 10
-    scalestart_at_index = scalestart_at_second / simparams.recordings.outputs.samplinginterval_rate
+    scalestart_at_index = int(scalestart_at_second / simparams.recordings.outputs.samplinginterval_rate)
     # print scalestart_at_index
     # print scaledata.shape
     theYmax = scaledata[scalestart_at_index:-1].max()
@@ -461,7 +461,7 @@ def plotResponses(axesdims, simparams, datafile_basename, timespan=None):
     #     #denseSpiketimes.reshape((stepspersecond*patterninterval,-1))
     #     #np.reshape(denseSpiketimes,(stepspersecond*patterninterval,-1))
     #     #np.reshape(denseSpiketimes,(200,-1))
-    denseSpiketimes = denseSpiketimes.reshape((-1, stepspersecond * simparams.neurongroups.inputs.patterninterval))
+    denseSpiketimes = denseSpiketimes.reshape((-1, int(stepspersecond * simparams.neurongroups.inputs.patterninterval) ))
     # print denseSpiketimes.shape
 
     xmin = 0
@@ -496,8 +496,8 @@ def plotResponseHistograms(axesdims, simparams, datafile_basename, timespan=None
     useLastXFractionOfData = 3.0 / 4.0;
     # nestedPrint(simparams )
 
-    denseSpiketimes = denseSpiketimes.reshape((-1, stepspersecond * simparams.neurongroups.inputs.patterninterval))
-    responseHistogram = (denseSpiketimes[(denseSpiketimes.shape[0] * useLastXFractionOfData):, :]).sum(axis=0)
+    denseSpiketimes = denseSpiketimes.reshape((-1, int(stepspersecond * simparams.neurongroups.inputs.patterninterval) ))
+    responseHistogram = (denseSpiketimes[int(denseSpiketimes.shape[0] * useLastXFractionOfData):, :]).sum(axis=0)
     # print "denseSpiketimes.sum: " + str( responseHistogram )
 
     # print "responseHistogram[0:20]: " + str(responseHistogram[0:20])
