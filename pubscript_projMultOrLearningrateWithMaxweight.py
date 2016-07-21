@@ -1,10 +1,11 @@
 import os
-import numpy as np
-import dotmap
-from SimonsPythonHelpers import nestedPrint
 
-import helpers
+import dotmap
+import numpy as np
+
 import figures
+import helpers
+
 
 def define_extended_simulation_parameters(metaparams,baseParams):
     """
@@ -160,21 +161,19 @@ def define_meta_parameters():
 def make_figures(params):
     try:
 
-        os.system( 'mkdir -p ' +params.metaparams.figures_path)
-
         # figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
-        figures.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
-        figures.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
-        figures.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
+        figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
+        figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
+        figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
 
 
         if params.baseParams.recordings.detailedtracking:
             # old: makeFigs(params.allsimparams,params.metaparams)
-            figures.figuretype_FinalWeightsWithRepetitions.makeFigs(params)
+            figures.per_paramset.figuretype_FinalWeightsWithRepetitions.makeFigs(params)
 
             # if metaparams.numRepetitions < 5:
             # old: makeFigs(params.allsimparams,params.metaparams)
-            figures.figuretype_DevelopmentOfResponses.makeFigs(params)
+            figures.per_repetition.figuretype_DevelopmentOfResponses.makeFigs(params)
 
 
     except IOError as e:
