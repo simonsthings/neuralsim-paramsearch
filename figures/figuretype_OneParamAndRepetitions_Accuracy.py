@@ -8,7 +8,11 @@ import helpers.parameters
 from SimonsPythonHelpers import nestedPrint
 
 
-def makeFig(params, paramFullPath):
+def makeFig(params, paramdotpath):
+
+    figtypename = 'OneParamAndRepetitions_Accuracy'
+
+    print "Making figure type " + figtypename + " for parameter '" + paramdotpath + "'."
 
     #paramStringList = params.allsimparams[0].extendedparams.keys()
     paramStringList = params.flatParamLists.keys()
@@ -21,12 +25,12 @@ def makeFig(params, paramFullPath):
     #for paramString in allsimparams[0].extendedparams:
     #    print paramString
 
-    # paramFullPath = allsimparams[0].extendedparams.keys()[0]
+    # paramdotpath = allsimparams[0].extendedparams.keys()[0]
 
-    if paramFullPath in paramStringList:
+    if paramdotpath in paramStringList:
 
         otherParamStringsList = list(paramStringList)
-        otherParamStringsList.remove(paramFullPath)
+        otherParamStringsList.remove(paramdotpath)
 
         if otherParamStringsList: # if there are free parameters that require separate figures to be generated:
             groupedParamSets = helpers.parameters.splitByParameter(params.allsimparams,params.flatParamLists,otherParamStringsList)
@@ -35,25 +39,25 @@ def makeFig(params, paramFullPath):
 
             #nestedPrint(groupedParamSets,maxDepth=3)
 
-            #print "Making figure for parameter '"+paramFullPath+"' and not for other parameters: "+ str(otherParamStringsList)
+            #print "Making figure for parameter '"+paramdotpath+"' and not for other parameters: "+ str(otherParamStringsList)
 
 
-            # rearrange allsimparams into groups of otherparams with only varying values of paramFullPath:
-            # do something for each value of each parameter except the given paramFullPath!
+            # rearrange allsimparams into groups of otherparams with only varying values of paramdotpath:
+            # do something for each value of each parameter except the given paramdotpath!
             # get subset of appsimparams where
 
             for paramGroupString in groupedParamSets.keys():
                 paramSubgroup = groupedParamSets[paramGroupString]
 
-                doThePlotting(params.metaparams,paramSubgroup,paramGroupString,paramFullPath)
+                __doThePlotting(params.metaparams, paramSubgroup, paramGroupString, paramdotpath)
 
         else: # all parameter sets can be represented in a single figure:
-            doThePlotting(params.metaparams, params.allsimparams, "theOnlyFigure", paramFullPath)
+            __doThePlotting(params.metaparams, params.allsimparams, "theOnlyFigure", paramdotpath)
     else:
-        print "Skipping figure generation for param '"+paramFullPath+"' because this parameter was not found among the extended params lists."
+        print "Skipping figure generation for param '" + paramdotpath + "' because this parameter was not found among the extended params lists."
 
 
-def doThePlotting(metaparams,paramSubgroup,paramGroupString,paramFullPath):
+def __doThePlotting(metaparams, paramSubgroup, paramGroupString, paramFullPath):
 
     shortPrarmStringID = paramFullPath.rfind('.')
     shortParamString = paramFullPath[shortPrarmStringID+1:]
@@ -73,17 +77,17 @@ def doThePlotting(metaparams,paramSubgroup,paramGroupString,paramFullPath):
 
     figAccuracies = plt.figure(figsize=fs)
 
-    plotAccuracies_param1_Repetitions(location1, paramSubgroup, metaparams, 'tpr', paramFullPath)
-    plotAccuracies_param1_Repetitions(location2, paramSubgroup, metaparams, 'fpr', paramFullPath)
-    plotTPRvsFPR_projMult(location3, paramSubgroup, metaparams, paramFullPath)
-    plotROC_projMult(location4, paramSubgroup, metaparams)
+    __plotAccuracies_param1_Repetitions(location1, paramSubgroup, metaparams, 'tpr', paramFullPath)
+    __plotAccuracies_param1_Repetitions(location2, paramSubgroup, metaparams, 'fpr', paramFullPath)
+    __plotTPRvsFPR_projMult(location3, paramSubgroup, metaparams, paramFullPath)
+    __plotROC_projMult(location4, paramSubgroup, metaparams)
 
     figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
     figAccuracies.savefig(figPath + figName + '.png')
     plt.close(figAccuracies)
 
 
-def plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, columnToUse, paramPathString):
+def __plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, columnToUse, paramPathString):
     from helpers.parameters import getParamRecursively
 
     fig = plt.gcf()
@@ -154,7 +158,7 @@ def plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, col
     pass
 
 
-def plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathString):
+def __plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathString):
     from helpers.parameters import getParamRecursively
 
     fig = plt.gcf()
@@ -212,7 +216,7 @@ def plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathString
 
 
 
-def plotROC_projMult(newlocation, allsimparams, metaparams):
+def __plotROC_projMult(newlocation, allsimparams, metaparams):
     fig = plt.gcf()
     ax = fig.add_axes(newlocation, title='ROC')
 

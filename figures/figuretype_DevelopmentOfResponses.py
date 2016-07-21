@@ -6,9 +6,11 @@ from numpy import int32, arange
 import peakutils
 
 
-def make_singlerun_figures(params, paramFullPath=None):
+def makeFigs(params, paramFullPath=None):
 
 	figtypename = 'DevelopmentOfResponses'
+
+	print "Making figure type "+figtypename+" for all parameters."
 
 	allsimparams = params.allsimparams
 	metaparams = params.metaparams
@@ -57,20 +59,20 @@ def make_singlerun_figures(params, paramFullPath=None):
 			# print "Drawing weight development figure for repetition "+str(repetitionID)+" in folder "+simparams.extendedparamFoldername+"."
 			figWeightsDevelopment = plt.figure(figsize=(9, 11))
 			if False:
-				weightdata = readWeightsFromFiles(simparams, metaparams, repfolder)
-				(axBounds, axXlim) = plotWeights(axesdims, simparams, weightdata)
+				weightdata = __readWeightsFromFiles(simparams, metaparams, repfolder)
+				(axBounds, axXlim) = __plotWeights(axesdims, simparams, weightdata)
 				axesdims.figWeights.x2 = axBounds[0]
 				axesdims.figWeights.w2 = axBounds[2]
-				plotWeightTraces(axesdims, simparams, weightdata)
+				__plotWeightTraces(axesdims, simparams, weightdata)
 			else:
 				axesdims.figWeights.x2 = axesdims.figWeights.x1
 				axesdims.figWeights.w2 = 0.75
 				axXlim = None
 			datafile_basename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.data_basename
-			plotResponses(          axesdims, simparams, datafile_basename, timespan=axXlim)
-			plotResponseHistograms( axesdims, simparams, datafile_basename, timespan=axXlim)
-			plotOutputrate(         axesdims, simparams, datafile_basename, timespan=axXlim)
-			# plotWeightstatistics(axesdims,simparams,datafile_basename,timespan=axXlim)
+			__plotResponses(axesdims, simparams, datafile_basename, timespan=axXlim)
+			__plotResponseHistograms(axesdims, simparams, datafile_basename, timespan=axXlim)
+			__plotOutputrate(axesdims, simparams, datafile_basename, timespan=axXlim)
+			# __plotWeightstatistics(axesdims,simparams,datafile_basename,timespan=axXlim)
 
 
 			if not paramFullPath:
@@ -94,27 +96,29 @@ def make_singlerun_figures(params, paramFullPath=None):
 			# save this figure's path for later reference during html file generation:
 			simparams.figures[figtypename][repetitionID] = figPath[len(metaparams.figures_path):] + figName
 
-	# simdata = getSimData(metaparams.data_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename)
+
+	# TODO: split this file into two figure types:
+	# simdata = __getSimData(metaparams.data_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename)
 	#         for mi in xrange(len(simparams.recordings.dtintervalsAsFloats.starttimes)):
 	#             starttime = simparams.recordings.dtintervalsAsFloats.starttimes[mi]
 	#             stoptime = simparams.recordings.dtintervalsAsFloats.stoptimes[mi]
 	#             timespan = (starttime,stoptime)  # seconds
 	#             print "Now drawing membrane and raster plot figure for timespan " + str(timespan) + ""
 	#             figSpikesAndMembranes = plt.figure()
-	#             inputraster(axesdims,simdata,timespan)
-	#             membranes(axesdims,simdata,timespan)
-	#             ampa(axesdims,simdata,timespan)
-	#             #nmda(axesdims,simdata,timespan)
-	#             outputraster(axesdims,simdata,timespan)
+	#             __plotInputraster(axesdims,simdata,timespan)
+	#             __plotMembranes(axesdims,simdata,timespan)
+	#             __plotAmpa(axesdims,simdata,timespan)
+	#             #__plotNmda(axesdims,simdata,timespan)
+	#             __plotOutputraster(axesdims,simdata,timespan)
 	#             figSpikesAndMembranes.savefig(metaparams.figures_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename+'_SpikesAndMembranes_start'+str(starttime)+'s.png')
 	#             #plt.show() ; exit()
 	#             plt.close(figSpikesAndMembranes)
 	#
 
-	make_singleruns_html(allsimparams, metaparams,figtypename,paramGroupString,paramFullPath)
+	__make_html(allsimparams, metaparams, figtypename, paramGroupString, paramFullPath)
 
 
-def make_singleruns_html(allsimparams, metaparams,figtypename,paramGroupString,paramFullPath): # TODO: use paramGroupString and paramFullPath to name the html file better.
+def __make_html(allsimparams, metaparams, figtypename, paramGroupString, paramFullPath): # TODO: use paramGroupString and paramFullPath to name the html file better.
 	htmlfile = open(metaparams.figures_path + '/overview_'+figtypename+'.html', 'w')
 
 	htmlfile.write('<html> \n')
@@ -152,7 +156,9 @@ def make_singleruns_html(allsimparams, metaparams,figtypename,paramGroupString,p
 
 
 
-def getSingleDatatrail(filename, columnNames):
+def __getSingleDatatrail(filename, columnNames):
+
+	datatrail = []
 	if os.path.isfile(filename) and os.path.getsize(filename) > 0:
 		try:
 			datatrail = np.genfromtxt(filename,
@@ -168,29 +174,28 @@ def getSingleDatatrail(filename, columnNames):
 			print "The file '" + filename + "' does not exist. Skipping."
 		else:
 			print "The file '" + filename + "' is empty. Skipping."
-		datatrail = []
 
 	return datatrail
 
 
-def getSimData(datafile_basename):
+def __getSimData(datafile_basename):
 	simdata = {}
-	simdata['input_raster'] = getSingleDatatrail(datafile_basename + '_inputs.ras', "time,nodeID")
-	simdata['output_raster'] = getSingleDatatrail(datafile_basename + '_outputs.ras', "time,nodeID")
-	simdata['membranes'] = getSingleDatatrail(datafile_basename + '.mem', "time,mempot")
-	simdata['ampa'] = getSingleDatatrail(datafile_basename + '.ampa', "time,ampa")
-	simdata['nmda'] = getSingleDatatrail(datafile_basename + '.nmda', "time,nmda")
+	simdata['input_raster'] = __getSingleDatatrail(datafile_basename + '_inputs.ras', "time,nodeID")
+	simdata['output_raster'] = __getSingleDatatrail(datafile_basename + '_outputs.ras', "time,nodeID")
+	simdata['membranes'] = __getSingleDatatrail(datafile_basename + '.mem', "time,mempot")
+	simdata['ampa'] = __getSingleDatatrail(datafile_basename + '.ampa', "time,ampa")
+	simdata['nmda'] = __getSingleDatatrail(datafile_basename + '.nmda', "time,nmda")
 	return simdata
 
 
-def membranes(axesdims, theSimdata, timespan=None):
+def __plotMembranes(axesdims, theSimdata, timespan=None):
 	datatrail = theSimdata['membranes']
 
 	newlocation = [axesdims.figSpikes.x, axesdims.figSpikes.y2, axesdims.figSpikes.w, axesdims.figSpikes.h2]
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title='membrane potentials')
 
-	# Crop large membranes:
+	# Crop large __plotMembranes:
 	datatrail['mempot'][datatrail['mempot'] > 30] = 30
 
 	# print(simdata)
@@ -213,7 +218,7 @@ def membranes(axesdims, theSimdata, timespan=None):
 	ax.set_yticks(newYticks)
 
 
-def ampa(axesdims, theSimdata, timespan=None):
+def __plotAmpa(axesdims, theSimdata, timespan=None):
 	datatrail = theSimdata['ampa']
 
 	newlocation = [axesdims.figSpikes.x, axesdims.figSpikes.y4, axesdims.figSpikes.w, axesdims.figSpikes.h4]
@@ -237,7 +242,7 @@ def ampa(axesdims, theSimdata, timespan=None):
 	ax.set_yticks(newYticks)
 
 
-def nmda(axesdims, theSimdata, timespan=None):
+def __plotNmda(axesdims, theSimdata, timespan=None):
 	datatrail = theSimdata['nmda']
 
 	newlocation = [axesdims.figSpikes.x, axesdims.figSpikes.y5, axesdims.figSpikes.w, axesdims.figSpikes.h5]
@@ -261,7 +266,7 @@ def nmda(axesdims, theSimdata, timespan=None):
 	ax.set_yticks(newYticks)
 
 
-def inputraster(axesdims, theSimdata, timespan=None):
+def __plotInputraster(axesdims, theSimdata, timespan=None):
 	datatrail = theSimdata['input_raster']
 
 	newlocation = [axesdims.figSpikes.x, axesdims.figSpikes.y1, axesdims.figSpikes.w, axesdims.figSpikes.h1]
@@ -278,7 +283,7 @@ def inputraster(axesdims, theSimdata, timespan=None):
 	plt.ylim([0, 700])
 
 
-def outputraster(axesdims, theSimdata, timespan=None):
+def __plotOutputraster(axesdims, theSimdata, timespan=None):
 	datatrail = theSimdata['output_raster']
 
 	newlocation = [axesdims.figSpikes.x, axesdims.figSpikes.y3, axesdims.figSpikes.w, axesdims.figSpikes.h3]
@@ -312,8 +317,8 @@ def outputraster(axesdims, theSimdata, timespan=None):
 
 
 
-def plotWeights(axesdims, simparams, weightdata):
-	# (timeaxis,weightdevelopment) = readWeightsFromFiles(simparams,sim_data_path,sim_data_basename)
+def __plotWeights(axesdims, simparams, weightdata):
+	# (timeaxis,weightdevelopment) = __readWeightsFromFiles(simparams,sim_data_path,sim_data_basename)
 	(timeaxis, weightdevelopment) = weightdata
 
 	newlocation = [axesdims.figWeights.x1, axesdims.figWeights.y1, axesdims.figWeights.w1, axesdims.figWeights.h1]
@@ -346,7 +351,7 @@ def plotWeights(axesdims, simparams, weightdata):
 	return (ax.get_position().bounds, plt.xlim())
 
 
-def plotWeightTraces(axesdims, simparams, weightdata):
+def __plotWeightTraces(axesdims, simparams, weightdata):
 	(timeaxis, weightdevelopment) = weightdata
 
 	newlocation = [axesdims.figWeights.x2, axesdims.figWeights.y3, axesdims.figWeights.w2, axesdims.figWeights.h3]
@@ -374,7 +379,7 @@ def plotWeightTraces(axesdims, simparams, weightdata):
 	# ax.set_xticks([])
 
 
-def readWeightsFromFiles(simparams, metaparams, repfolder):
+def __readWeightsFromFiles(simparams, metaparams, repfolder):
 	print "Reading weight snapshots..."
 	weightssummaryfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.weightmatrix'
 	print weightssummaryfilename
@@ -406,7 +411,7 @@ def readWeightsFromFiles(simparams, metaparams, repfolder):
 	return (timeaxis, weightdevelopment)
 
 
-def plotOutputrate(axesdims, simparams, datafile_basename, timespan=None):
+def __plotOutputrate(axesdims, simparams, datafile_basename, timespan=None):
 	newlocation = [axesdims.figWeights.x2, axesdims.figWeights.y2, axesdims.figWeights.w2, axesdims.figWeights.h2]
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title="output neuron's (sliding average) rate")
@@ -446,7 +451,7 @@ def plotOutputrate(axesdims, simparams, datafile_basename, timespan=None):
 	ax.set_xticks([])
 
 
-def plotResponses(axesdims, simparams, datafile_basename, timespan=None):
+def __plotResponses(axesdims, simparams, datafile_basename, timespan=None):
 	newlocation = [axesdims.figWeights.x2, axesdims.figWeights.y4, axesdims.figWeights.w2, axesdims.figWeights.h4]
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title="output neuron's responses relative to pattern onset")
@@ -496,7 +501,7 @@ def plotResponses(axesdims, simparams, datafile_basename, timespan=None):
 	plt.xlabel('time (s)')
 
 
-def plotResponseHistograms(axesdims, simparams, datafile_basename, timespan=None):
+def __plotResponseHistograms(axesdims, simparams, datafile_basename, timespan=None):
 	newlocation = [axesdims.figWeights.x3, axesdims.figWeights.y4, axesdims.figWeights.w3, axesdims.figWeights.h4]
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title="peaks")
@@ -569,7 +574,7 @@ def plotResponseHistograms(axesdims, simparams, datafile_basename, timespan=None
 	plt.xlabel('#')
 
 
-def plotWeightstatistics(axesdims, simparams, datafile_basename, timespan=None):
+def __plotWeightstatistics(axesdims, simparams, datafile_basename, timespan=None):
 	newlocation = [axesdims.figWeights.x2, axesdims.figWeights.y3, axesdims.figWeights.w2, axesdims.figWeights.h3]
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title="output neuron's weight stats")

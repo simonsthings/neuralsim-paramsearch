@@ -163,18 +163,18 @@ def make_figures(params):
         os.system( 'mkdir -p ' +params.metaparams.figures_path)
 
         # figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
-        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='neurongroups.outputs.projMult')
-        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='connectionsets.con1.stdprule.learningrate')
-        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='connectionsets.con1.maximumweight')
+        figures.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
+        figures.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
+        figures.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
 
 
         if params.baseParams.recordings.detailedtracking:
-            # old: make_repetitionsummary_figures(params.allsimparams,params.metaparams)
-            figures.makeFigureType_FinalWeightsWithRepetitions(params)
+            # old: makeFigs(params.allsimparams,params.metaparams)
+            figures.figuretype_FinalWeightsWithRepetitions.makeFigs(params)
 
             # if metaparams.numRepetitions < 5:
-            # old: make_singlerun_figures(params.allsimparams,params.metaparams)
-            figures.makeFigureType_DevelopmentOfResponses(params)
+            # old: makeFigs(params.allsimparams,params.metaparams)
+            figures.figuretype_DevelopmentOfResponses.makeFigs(params)
 
 
     except IOError as e:

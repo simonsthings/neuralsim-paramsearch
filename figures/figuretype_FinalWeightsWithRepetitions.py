@@ -5,9 +5,11 @@ import numpy as np
 from dotmap import DotMap
 
 
-def make_repetitionsummary_figures(params, paramFullPath=None):
+def makeFigs(params, paramFullPath=None):
 
 	figtypename = 'FinalWeightsWithRepetitions'
+
+	print "Making figure type "+figtypename+" for all parameters."
 
 	allsimparams = params.allsimparams
 	metaparams = params.metaparams
@@ -22,19 +24,19 @@ def make_repetitionsummary_figures(params, paramFullPath=None):
 	for simparams in allsimparams:
 		print "Drawing "+figtypename+" figure for simulations that have '"+ simparams.extendedparamFoldername[5:] + "' in common."
 		figFinalWeights = plt.figure(figsize=(6, 12))
-		plotFinalWeights(axesdims, simparams, metaparams)
+		__plotFinalWeights(axesdims, simparams, metaparams)
 
-		(figPath, figName) = prepareFigurePathAndName(simparams,metaparams,paramGroupString, paramFullPath, figtypename)
+		(figPath, figName) = __prepareFigurePathAndName(simparams, metaparams, paramGroupString, paramFullPath, figtypename)
 		figFinalWeights.savefig(figPath + figName + '.png')
 		plt.close(figFinalWeights)
 
 		# save this figure's path for later reference during html file generation:
 		simparams.figures[figtypename] = figPath[len(metaparams.figures_path):] + figName
 
-	make_repetitionsummary_html(allsimparams, metaparams, figtypename)
+	__make_html(allsimparams, metaparams, figtypename)
 
 
-def make_repetitionsummary_html(allsimparams, metaparams, figtypename):
+def __make_html(allsimparams, metaparams, figtypename):
 	htmlfile = open(metaparams.figures_path + '/overview_'+figtypename+'.html', 'w')
 
 	htmlfile.write('<html> \n')
@@ -51,7 +53,7 @@ def make_repetitionsummary_html(allsimparams, metaparams, figtypename):
 	htmlfile.close()
 
 
-def prepareFigurePathAndName(simparams,metaparams,paramGroupString,paramFullPath,figtypename):
+def __prepareFigurePathAndName(simparams, metaparams, paramGroupString, paramFullPath, figtypename):
 
 	if not paramFullPath:
 		shortParamString = 'allparams'
@@ -68,13 +70,13 @@ def prepareFigurePathAndName(simparams,metaparams,paramGroupString,paramFullPath
 	return figPath,figName
 
 
-def plotFinalWeights(axesdims, simparams, metaparams):
+def __plotFinalWeights(axesdims, simparams, metaparams):
 	newlocation = [axesdims.figFinalWeights.x1, axesdims.figFinalWeights.y1, axesdims.figFinalWeights.w1,
 				   axesdims.figFinalWeights.h1]
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title='final weights (' + str(metaparams.numRepetitions) + ' repetitions)')
 
-	finalweights = readFinalWeights(simparams, metaparams)
+	finalweights = __readFinalWeights(simparams, metaparams)
 
 	# plt.imshow(weightdevelopment.T, aspect='auto',extent=[extent_left,extent_right,extent_bottom,extent_top],interpolation='none')
 	plt.imshow(finalweights.T, aspect='auto', interpolation='none')
@@ -96,7 +98,7 @@ def plotFinalWeights(axesdims, simparams, metaparams):
 	pass
 
 
-def readFinalWeights(simparams, metaparams):
+def __readFinalWeights(simparams, metaparams):
 	finalweights = np.zeros([metaparams.numRepetitions, simparams.neurongroups.inputs.N])
 
 	for repetitionID in xrange(metaparams.numRepetitions):
