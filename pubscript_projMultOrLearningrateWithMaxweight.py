@@ -3,12 +3,7 @@ import numpy as np
 import dotmap
 from SimonsPythonHelpers import nestedPrint
 
-from helpers.parameters import flattenExtendedParamsets, crossAllParamsets
-from helpers.simulation import run_simulation
-
-#from figures.figuretype_OneParamAndRepetitions_Accuracy import makeFig
-from figures.repetitiondetail import make_singlerun_figures
-from figures.repetitionsummary import make_repetitionsummary_figures
+import helpers
 import figures
 
 def define_extended_simulation_parameters(metaparams,baseParams):
@@ -18,17 +13,37 @@ def define_extended_simulation_parameters(metaparams,baseParams):
     """
 
     extendedParams = dotmap.DotMap()
-    extendedParams.neurongroups.outputs.userecovery = [True,False]
+    #extendedParams.neurongroups.outputs.userecovery = [True,False]
     #extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
-    extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
+    #extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
     #extendedParams.neurongroups.outputs.projMult = np.r_[0.2:2.2:0.2]
     #extendedParams.neurongroups.outputs.projMult = np.r_[2.2:4.2:0.2]
     #extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 
     #extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
-    ##extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
+    #extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
+
+    extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
+    #extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
+    #extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:8.2:0.2]
 
     return extendedParams
+
+def define_dependent_simulation_parameters():
+
+    dependentParams = {}
+
+    # key: path of dependent param. value: list of operations to compute the dependent param by:
+    # value: ( source param path , math operation , value to apply )
+    #dependentParams['connectionsets.con1.maximumweight'] = [ ('mul','connectionsets.con1.stdprule.learningrate' ,'*', 32.0) ]
+    #dependentParams['connectionsets.con1.initialweight'] = [ ('mul','connectionsets.con1.stdprule.learningrate' ,'*', 32.0) ]
+
+    #dependentParams['connectionsets.con1.initialweight'] = [ ('mul', 'connectionsets.con1.maximumweight' ,'*', 1.0) , ('mul', 'connectionsets.con1.stdprule.learningrate' ,'*', 32.0)]
+
+    dependentParams['connectionsets.con1.stdprule.learningrate'] = [ ('mul','connectionsets.con1.maximumweight' ,'*', 1.0) ]
+    dependentParams['connectionsets.con1.initialweight']         = [ ('mul','connectionsets.con1.maximumweight' ,'*', 1.0) ]
+
+    return dependentParams
 
 
 def define_base_simulation_parameters(metaparams):
@@ -136,7 +151,7 @@ def define_meta_parameters():
     metaparams.data_basename = 'simon5'
     metaparams.figures_path = './datafig/'+metaparams.executable_file+'.figures/'
     metaparams.figures_basename = metaparams.data_basename
-    metaparams.numRepetitions = 1
+    metaparams.numRepetitions = 10
     for repetitionID in xrange(metaparams.numRepetitions):
         metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
     return metaparams
@@ -150,13 +165,16 @@ def make_figures(params):
         # figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
         figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='neurongroups.outputs.projMult')
         figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='connectionsets.con1.stdprule.learningrate')
+        figures.makeFiguretype_OneParamAndRepetitions_Accuracy(params, paramString='connectionsets.con1.maximumweight')
 
 
         if params.baseParams.recordings.detailedtracking:
-            make_repetitionsummary_figures(params.allsimparams,params.metaparams)
+            # old: make_repetitionsummary_figures(params.allsimparams,params.metaparams)
+            figures.makeFigureType_FinalWeightsWithRepetitions(params)
 
             # if metaparams.numRepetitions < 5:
-            make_singlerun_figures(params.allsimparams,params.metaparams)
+            # old: make_singlerun_figures(params.allsimparams,params.metaparams)
+            figures.makeFigureType_DevelopmentOfResponses(params)
 
 
     except IOError as e:
@@ -175,20 +193,24 @@ def main():
     ##### Define simulation settings: ####
     params.baseParams = define_base_simulation_parameters(params.metaparams)
     params.extendedParams = define_extended_simulation_parameters(params.metaparams,params.baseParams)
+    params.dependentParams = define_dependent_simulation_parameters()
 
     ##### Rearrange them: #####
-    params.flatParamLists = flattenExtendedParamsets(params.metaparams, params.baseParams, params.extendedParams)
-    params.allsimparams = crossAllParamsets(params.baseParams, params.flatParamLists.copy())
-    #nestedPrint(allsimparams)
+    params.flatParamLists = helpers.parameters.flattenExtendedParamsets(params.metaparams, params.baseParams, params.extendedParams)
+    params.allsimparams = helpers.parameters.crossAllParamsets(params.baseParams, params.flatParamLists.copy())
+    #nestedPrint(params.allsimparams)
+
+    ##### Update Dependent parameters: #####
+    helpers.parameters.adjustDependentParameters(params)
+    #nestedPrint(params.allsimparams)
 
 
     ##### Run simulation(s) #####
-    run_simulation(params, False)
+    helpers.simulation.run_simulation(params, False)
 
 
     ##### Plot results #####
     make_figures(params)
-
 
 
 if __name__ == "__main__":
@@ -201,20 +223,7 @@ if __name__ == "__main__":
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
         
         
         

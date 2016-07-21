@@ -10,8 +10,6 @@ from SimonsPythonHelpers import nestedPrint
 
 def makeFig(params, paramFullPath):
 
-    allsimparams = params.allsimparams
-    metaparams = params.metaparams
     #paramStringList = params.allsimparams[0].extendedparams.keys()
     paramStringList = params.flatParamLists.keys()
 
@@ -31,7 +29,7 @@ def makeFig(params, paramFullPath):
         otherParamStringsList.remove(paramFullPath)
 
         if otherParamStringsList: # if there are free parameters that require separate figures to be generated:
-            groupedParamSets = helpers.parameters.splitByParameter(allsimparams,params.flatParamLists,otherParamStringsList)
+            groupedParamSets = helpers.parameters.splitByParameter(params.allsimparams,params.flatParamLists,otherParamStringsList)
             #print "The type of groupedParamSets is "+str(type(groupedParamSets))
             #nestedPrint(groupedParamSets,maxDepth=2)
 
@@ -47,10 +45,10 @@ def makeFig(params, paramFullPath):
             for paramGroupString in groupedParamSets.keys():
                 paramSubgroup = groupedParamSets[paramGroupString]
 
-                doThePlotting(metaparams,paramSubgroup,paramGroupString,paramFullPath)
+                doThePlotting(params.metaparams,paramSubgroup,paramGroupString,paramFullPath)
 
         else: # all parameter sets can be represented in a single figure:
-            doThePlotting(metaparams, allsimparams, "theOnlyFigure", paramFullPath)
+            doThePlotting(params.metaparams, params.allsimparams, "theOnlyFigure", paramFullPath)
     else:
         print "Skipping figure generation for param '"+paramFullPath+"' because this parameter was not found among the extended params lists."
 
@@ -65,11 +63,13 @@ def doThePlotting(metaparams,paramSubgroup,paramGroupString,paramFullPath):
     os.system('mkdir -p ' + figPath)
 
     #axesdims = dotmap.DotMap()
-    fs = (8 ,10)
-    location1 = [0.1 ,0.45 ,0.28 ,0.45]
-    location2 = [0.55 ,0.45 ,0.28 ,0.45]
-    location3 = [0.1 ,0.09 ,0.5 ,0.2]
-    location4 = [0.7 ,0.09 , 0.2 /fs[0 ] *fs[1] ,0.2]
+    fs = (12 ,8)
+    #location1 = [0.1 ,0.45 ,0.28 ,0.45]
+    #location2 = [0.55 ,0.45 ,0.28 ,0.45]
+    location1 = [0.1 ,0.75 ,0.65 ,0.2]
+    location2 = [0.1 ,0.42 ,0.65 ,0.2]
+    location3 = [0.1 ,0.09 ,0.65 ,0.2]
+    location4 = [0.85 ,0.09 , 0.2 /fs[0 ] *fs[1] ,0.2]
 
     figAccuracies = plt.figure(figsize=fs)
 
@@ -78,8 +78,8 @@ def doThePlotting(metaparams,paramSubgroup,paramGroupString,paramFullPath):
     plotTPRvsFPR_projMult(location3, paramSubgroup, metaparams, paramFullPath)
     plotROC_projMult(location4, paramSubgroup, metaparams)
 
-    figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString + '.png'
-    figAccuracies.savefig(figPath + figName)
+    figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
+    figAccuracies.savefig(figPath + figName + '.png')
     plt.close(figAccuracies)
 
 
@@ -87,16 +87,20 @@ def plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, col
     from helpers.parameters import getParamRecursively
 
     fig = plt.gcf()
-    ax = fig.add_axes(newlocation, title='final ' + str(columnToUse) + ' (x' + str(metaparams.numRepetitions) + ')')
+    tprfprString = 'true positive rate'
+    if columnToUse == 'fpr':
+        tprfprString = 'false positive rate'
 
-    y_labels = []
+    ax = fig.add_axes(newlocation, title='(final) ' + tprfprString + ' (x' + str(metaparams.numRepetitions) + ')')
+
+    x_ticklabels = []
     true_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
     for sid in xrange(len(allsimparams)):
         simparams = allsimparams[sid]
 
         # print "projMult: " + str(simparams.neurongroups.outputs.projMult)
         paramValue = getParamRecursively(paramPathString, simparams)
-        y_labels.append(paramValue)
+        x_ticklabels.append(paramValue)
 
         for repetitionID in xrange(metaparams.numRepetitions):
             repfolder = metaparams.repetitionFoldernames[repetitionID]
@@ -115,30 +119,38 @@ def plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, col
             true_positive_rates[sid, repetitionID] = simdata[columnToUse][-1];
             # true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
 
-    plt.imshow(true_positive_rates, aspect='auto', interpolation='nearest')
+    plt.imshow(true_positive_rates.T, aspect='auto', interpolation='nearest')
     # plt.colorbar()
     plt.clim(0, 1)
 
-    theXticks = arange(metaparams.numRepetitions)
-    plt.xticks(theXticks, theXticks + 1)
-    plt.yticks(np.r_[0:len(y_labels)], y_labels)
+    theYticks = arange(metaparams.numRepetitions)
+    plt.yticks(theYticks, theYticks + 1)
 
-    plt.xlabel('repetitions')
+    plt.ylabel('repetitions')
     paramShortID = paramPathString.rfind('.')
     paramShortString = paramPathString[paramShortID + 1:]
-    plt.ylabel(paramShortString)
+    plt.xlabel(paramShortString)
+    plt.xticks(np.r_[0:len(x_ticklabels)], x_ticklabels)
+
+    currentXTicks = plt.xticks()
+    if len(x_ticklabels) > 10:
+        idx = np.r_[1:len(x_ticklabels):round(len(x_ticklabels)/10)].astype(int)
+        #print "idx: " + str(idx)
+        for id in idx:
+            currentXTicks[1][id]._text = ''
+    plt.xticks( *currentXTicks)
 
     # now show the means:
 
-    meanlocation = list(newlocation)
-    meanlocation[0] = newlocation[0] + newlocation[2] + 0.02
-    meanlocation[2] = newlocation[2] / metaparams.numRepetitions
-    ax2 = fig.add_axes(meanlocation, title='mean')
+    #meanlocation = list(newlocation)
+    #meanlocation[0] = newlocation[0] + newlocation[2] + 0.02
+    #meanlocation[2] = newlocation[2] / metaparams.numRepetitions
+    #ax2 = fig.add_axes(meanlocation, title='mean')
 
-    meanSomethingRates = true_positive_rates.mean(axis=1)
-    plt.imshow(np.expand_dims(meanSomethingRates, axis=1), aspect='auto')
-    plt.xticks([])
-    plt.yticks([])
+    #meanSomethingRates = true_positive_rates.mean(axis=1)
+    #plt.imshow(np.expand_dims(meanSomethingRates, axis=1), aspect='auto')
+    #plt.xticks([])
+    #plt.yticks([])
     pass
 
 
@@ -146,15 +158,16 @@ def plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathString
     from helpers.parameters import getParamRecursively
 
     fig = plt.gcf()
+    lastax = plt.gca()
     ax = fig.add_axes(newlocation, title='final TPR vs. FPR over projMults')
 
-    y_labels = []
+    x_ticklabels = []
     true_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
     false_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
     for sid in xrange(len(allsimparams)):
         simparams = allsimparams[sid]
         paramValue = getParamRecursively(paramPathString, simparams)
-        y_labels.append(paramValue)
+        x_ticklabels.append(paramValue)
 
         for repetitionID in xrange(metaparams.numRepetitions):
             repfolder = metaparams.repetitionFoldernames[repetitionID]
@@ -170,15 +183,33 @@ def plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathString
 
     meanTPRs = true_positive_rates.mean(axis=1)
     meanFPRs = false_positive_rates.mean(axis=1)
+    stdTPRs = true_positive_rates.std(axis=1)
+    stdFPRs = false_positive_rates.std(axis=1)
 
-    plt.plot(y_labels, meanTPRs)
-    plt.plot(y_labels, meanFPRs)
-    # plt.xticks(np.r_[0:len(y_labels)],y_labels)
+    # find useful min and max limits for the X axis:
+    xmin = x_ticklabels[0] - (x_ticklabels[1]-x_ticklabels[0])/2.0
+    xmax = x_ticklabels[-1] + (x_ticklabels[-1]-x_ticklabels[-2])/2.0
+
+    plt.fill_between(x_ticklabels, meanTPRs+stdTPRs, meanTPRs-stdTPRs, color=(0,0,1,0.1),linewidth=0.0)
+    plt.fill_between(x_ticklabels, meanFPRs+stdFPRs, meanFPRs-stdFPRs, color=(0,1,0,0.2),linewidth=0.0)
+
+    plt.plot(x_ticklabels, meanTPRs, label='final true positive rate',linewidth=2.0)
+    plt.plot(x_ticklabels, meanFPRs, label='final false positive rate',linewidth=2.0)
     plt.ylim([-0.1, 1.1])
+    plt.xlim([xmin,xmax])
     paramShortID = paramPathString.rfind('.')
     paramShortString = paramPathString[paramShortID + 1:]
     plt.xlabel(paramShortString)
     plt.ylabel('tp or fp rate')
+    plt.legend(fontsize=8, loc='center left')
+
+    if len(x_ticklabels) > 10:
+        idx = np.r_[0:len(x_ticklabels):round(len(x_ticklabels)/10)]
+        #print "idx: " + str(idx)
+        x_ticklabels = np.array(x_ticklabels)[idx.astype(int)]
+    plt.xticks( x_ticklabels)
+
+
 
 
 def plotROC_projMult(newlocation, allsimparams, metaparams):

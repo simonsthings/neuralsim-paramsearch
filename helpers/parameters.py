@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 from numpy import int32, arange
 import peakutils
 
-
-
+from SimonsPythonHelpers import nestedPrint
 
 
 def extendParamSet_old(metaparams, baseParams, extendedParams, allsimparams, originalBaseParams=None,
@@ -197,3 +196,67 @@ def getParamRecursively(onePath, simparams):
         return getParamRecursively(otherNodesString, simparams[firstNodeString])
     else:
         return simparams[onePath]
+
+
+
+
+def adjustDependentParameters(params):
+    """
+    Goes through each of the previously generated simparams, and adjusts some dependent parameters based on a combination of others.
+    :param params:
+    :return:
+    """
+
+    # do the following for each defined dependent param:
+    for targetParamString in params.dependentParams.keys():
+
+        # compute new dependent param value for each simparams set:
+        for simparams in params.allsimparams:
+
+            # start with the baseParam value and scale it by the dependent values:
+            newvalue = getParamRecursively(targetParamString, params.baseParams.toDict())
+            #print "old value of '"+targetParamString+"': " + str(newvalue)
+
+            #nestedPrint(params.baseParams)
+            #print "simparams.connectionsets.con1.maximumweight: " + str(simparams.connectionsets.con1.maximumweight)
+            #print "simparams.connectionsets.con1.stdprule.learningrate: " + str(simparams.connectionsets.con1.stdprule.learningrate)
+
+            # compute the new value and apply:
+            for operationTuple in params.dependentParams[targetParamString]:
+
+                (applyOp , sourceParamString , scaleOp , scaleValue) = operationTuple
+
+                sourceparamValue = getParamRecursively(sourceParamString, simparams.toDict())
+                #print "Source param '"+sourceParamString+"' is: "+str(sourceparamValue)
+
+                if   scaleOp == '*':
+                    modifiedSourceparamValue = sourceparamValue * scaleValue
+                elif scaleOp == '/':
+                    modifiedSourceparamValue = sourceparamValue / scaleValue
+                elif scaleOp == '+':
+                    modifiedSourceparamValue = sourceparamValue + scaleValue
+                elif scaleOp == '-':
+                    modifiedSourceparamValue = sourceparamValue - scaleValue
+                elif scaleOp == '**':
+                    modifiedSourceparamValue = sourceparamValue ** scaleValue
+                else:
+                    raise ValueError("Unknown scale math op: '" + scaleOp + "'. Please give one of { *, /, +, -, ** }")
+
+                # apply the scaled sourceparam to the targetparam:
+                if   applyOp == 'mul':
+                    newvalue *= modifiedSourceparamValue
+                elif applyOp == 'div':
+                    newvalue /= modifiedSourceparamValue
+                elif applyOp == 'add':
+                    newvalue += modifiedSourceparamValue
+                elif applyOp == 'sub':
+                    newvalue -= modifiedSourceparamValue
+                elif applyOp == 'pow':
+                    newvalue **= modifiedSourceparamValue
+                else:
+                    raise ValueError("Unknown apply math op: '"+applyOp+"'. Please give one of {mul,div,add,sub,pow}")
+
+            #print "new value for '"+targetParamString+"': " + str(newvalue)
+            setParamRecursively(targetParamString,newvalue,simparams)
+
+

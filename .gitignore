@@ -1,2 +1,4 @@
 datafig/
 .idea/
+datafig_old/
+**/*.pyc
