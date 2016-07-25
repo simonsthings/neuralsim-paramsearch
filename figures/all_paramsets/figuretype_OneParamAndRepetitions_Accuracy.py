@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from numpy import arange
 import os
 import helpers
-import helpers.parameters
 from SimonsPythonHelpers import nestedPrint
 
 
@@ -49,20 +48,21 @@ def makeFig(params, paramdotpath):
 			for paramGroupString in groupedParamSets.keys():
 				paramSubgroup = groupedParamSets[paramGroupString]
 
-				__doThePlotting(params.metaparams, paramSubgroup, paramGroupString, paramdotpath)
+				__doThePlotting(params, paramSubgroup, paramGroupString, paramdotpath,figtypename)
 
 		else: # all parameter sets can be represented in a single figure:
-			__doThePlotting(params.metaparams, params.allsimparams, "theOnlyFigure", paramdotpath)
+			__doThePlotting(params, params.allsimparams, "theOnlyFigure", paramdotpath,figtypename)
 	else:
 		print "Skipping figure generation for param '" + paramdotpath + "' because this parameter was not found among the extended params lists."
 
 
-def __doThePlotting(metaparams, paramSubgroup, paramGroupString, paramFullPath):
+def __doThePlotting(params, paramSubgroup, paramGroupString, paramFullPath,figtypename):
 
-	shortPrarmStringID = paramFullPath.rfind('.')
-	shortParamString = paramFullPath[shortPrarmStringID+1:]
+	metaparams = params.metaparams
 
-	figBlob = 'OneParamAndRepetitions_' + shortParamString + '_Accuracy'
+	shortParamString = helpers.parameters.getDependentParameterShortNameString(params, paramFullPath)
+
+	figBlob = figtypename + '_' + shortParamString
 	figPath = metaparams.figures_path + 'figtype_' + figBlob + '/'
 	os.system('mkdir -p ' + figPath)
 

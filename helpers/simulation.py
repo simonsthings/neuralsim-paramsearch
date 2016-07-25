@@ -93,6 +93,11 @@ def run_simulation(params ,wetRun=True):
         paramList = params.flatParamLists[flatParamString]
         print '- ' + flatParamString + ': ' + str(len(paramList)) + ' values'
 
+    print "Also, " +str(len(params.dependentParams.keys()))+" parameters depend on others:"
+    for dependentParamString in params.dependentParams.keys():
+        paramList = params.dependentParams[dependentParamString]
+        print '- ' + dependentParamString + ': ' + str(paramList) + ' '
+
     if wetRun:
         gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog.txt :::: par_jobs.txt"
         os.system(gnuParallelCmdString)
