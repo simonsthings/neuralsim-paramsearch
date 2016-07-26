@@ -2,7 +2,7 @@ import all_paramsets
 import per_paramset
 import per_repetition
 from figures.all_paramsets import figuretype_OneParamAndRepetitions_Accuracy
+from figures.all_paramsets import figuretype_TwoParams2D_Accuracy
 from figures.per_paramset import figuretype_FinalWeightsWithRepetitions
 from figures.per_repetition import figuretype_DevelopmentOfResponses
-
 

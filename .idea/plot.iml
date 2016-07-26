@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/datafig" />
       <excludeFolder url="file://$MODULE_DIR$/datafig_old" />
+      <excludeFolder url="file://$MODULE_DIR$/datafig_old2" />
+      <excludeFolder url="file://$MODULE_DIR$/datafig_*" />
       <excludeFolder url="file://$MODULE_DIR$/old" />
       <excludeFolder url="file://$MODULE_DIR$/sim_simon1.data" />
       <excludeFolder url="file://$MODULE_DIR$/sim_simon1.figures" />

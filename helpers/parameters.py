@@ -276,7 +276,6 @@ def getDependentParameterShortNameString(params,paramdotpath):
 	shortParamString = getShortParamString(paramdotpath)
 
 	if params.dependentParams.keys():
-		shortParamString += 'WITH'
 		shortParamCounter = 0
 
 	# do the following for each defined dependent param:
@@ -287,7 +286,9 @@ def getDependentParameterShortNameString(params,paramdotpath):
 
 			# if this dependent param actually uses the given paramdotpath:
 			if sourceParamString == paramdotpath:
-				if shortParamCounter > 0:
+				if shortParamCounter == 0:
+					shortParamString += 'WITH'
+				else:
 					shortParamString += 'AND'
 				shortParamString += getShortParamString(targetParamString)
 				shortParamCounter += 1

@@ -46,9 +46,9 @@ def makeFig(params, paramdotpath):
 			# get subset of appsimparams where
 
 			for paramGroupString in groupedParamSets.keys():
-				paramSubgroup = groupedParamSets[paramGroupString]
+				somesimparams = groupedParamSets[paramGroupString]
 
-				__doThePlotting(params, paramSubgroup, paramGroupString, paramdotpath,figtypename)
+				__doThePlotting(params, somesimparams, paramGroupString, paramdotpath,figtypename)
 
 		else: # all parameter sets can be represented in a single figure:
 			__doThePlotting(params, params.allsimparams, "theOnlyFigure", paramdotpath,figtypename)
@@ -56,7 +56,7 @@ def makeFig(params, paramdotpath):
 		print "Skipping figure generation for param '" + paramdotpath + "' because this parameter was not found among the extended params lists."
 
 
-def __doThePlotting(params, paramSubgroup, paramGroupString, paramFullPath,figtypename):
+def __doThePlotting(params, somesimparams, paramGroupString, paramFullPath, figtypename):
 
 	metaparams = params.metaparams
 
@@ -77,17 +77,17 @@ def __doThePlotting(params, paramSubgroup, paramGroupString, paramFullPath,figty
 
 	figAccuracies = plt.figure(figsize=fs)
 
-	__plotAccuracies_param1_Repetitions(location1, paramSubgroup, metaparams, 'tpr', paramFullPath)
-	__plotAccuracies_param1_Repetitions(location2, paramSubgroup, metaparams, 'fpr', paramFullPath)
-	__plotTPRvsFPR_projMult(location3, paramSubgroup, metaparams, paramFullPath)
-	__plotROC_projMult(location4, paramSubgroup, metaparams)
+	__plotAccuracies_param1_Repetitions(location1, somesimparams, metaparams, 'tpr', paramFullPath)
+	__plotAccuracies_param1_Repetitions(location2, somesimparams, metaparams, 'fpr', paramFullPath)
+	__plotTPRvsFPR_projMult(location3, somesimparams, metaparams, paramFullPath)
+	__plotROC_projMult(location4, somesimparams, metaparams, paramFullPath)
 
 	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
 	figAccuracies.savefig(figPath + figName + '.png')
 	plt.close(figAccuracies)
 
 
-def __plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, columnToUse, paramPathString):
+def __plotAccuracies_param1_Repetitions(newlocation, somesimparams, metaparams, columnToUse, paramPathString):
 	from helpers.parameters import getParamRecursively
 
 	fig = plt.gcf()
@@ -97,33 +97,15 @@ def __plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, c
 
 	ax = fig.add_axes(newlocation, title='(final) ' + tprfprString + ' (x' + str(metaparams.numRepetitions) + ')')
 
-	x_ticklabels = []
-	true_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
-	for sid in xrange(len(allsimparams)):
-		simparams = allsimparams[sid]
 
-		# print "projMult: " + str(simparams.neurongroups.outputs.projMult)
-		paramValue = getParamRecursively(paramPathString, simparams)
-		x_ticklabels.append(paramValue)
+	true_positive_rates, false_positive_rates, x_ticklabels = helpers.results.read_result_data_1D(metaparams, somesimparams, paramPathString)
 
-		for repetitionID in xrange(metaparams.numRepetitions):
-			repfolder = metaparams.repetitionFoldernames[repetitionID]
-
-			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
-			simdata = np.genfromtxt(stimdetfilename,
-									# names="time,tpr,fpr,t_div_f",
-									names="tpr,fpr,t_div_f",
-									comments='#',  # skip comment lines
-									dtype=None
-									)  # guess dtype of each column
-
-			numSnapshots = len(simdata)
-
-			# print simdata[columnToUse]
-			true_positive_rates[sid, repetitionID] = simdata[columnToUse][-1];
-			# true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
-
-	plt.imshow(true_positive_rates.T, aspect='auto', interpolation='nearest')
+	if columnToUse == 'tpr':
+		plt.imshow(true_positive_rates.T, aspect='auto', interpolation='nearest')
+	elif columnToUse == 'fpr':
+		plt.imshow(false_positive_rates.T, aspect='auto', interpolation='nearest')
+	else:
+		raise ValueError('Unknown column type: ' + str(columnToUse))
 	# plt.colorbar()
 	plt.clim(0, 1)
 
@@ -158,33 +140,14 @@ def __plotAccuracies_param1_Repetitions(newlocation, allsimparams, metaparams, c
 	pass
 
 
-def __plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathString):
+def __plotTPRvsFPR_projMult(newlocation, somesimparams, metaparams, paramPathString):
 	from helpers.parameters import getParamRecursively
 
 	fig = plt.gcf()
 	lastax = plt.gca()
 	ax = fig.add_axes(newlocation, title='final TPR vs. FPR over projMults')
 
-	x_ticklabels = []
-	true_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
-	false_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
-	for sid in xrange(len(allsimparams)):
-		simparams = allsimparams[sid]
-		paramValue = getParamRecursively(paramPathString, simparams)
-		x_ticklabels.append(paramValue)
-
-		for repetitionID in xrange(metaparams.numRepetitions):
-			repfolder = metaparams.repetitionFoldernames[repetitionID]
-			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
-			simdata = np.genfromtxt(stimdetfilename,
-									# names="time,tpr,fpr,t_div_f",
-									names="tpr,fpr,t_div_f",
-									comments='#',  # skip comment lines
-									dtype=None
-									)  # guess dtype of each column
-			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
-			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1];
-
+	true_positive_rates, false_positive_rates, x_ticklabels = helpers.results.read_result_data_1D(metaparams, somesimparams, paramPathString)
 	meanTPRs = true_positive_rates.mean(axis=1)
 	meanFPRs = false_positive_rates.mean(axis=1)
 	stdTPRs = true_positive_rates.std(axis=1)
@@ -214,31 +177,11 @@ def __plotTPRvsFPR_projMult(newlocation, allsimparams, metaparams, paramPathStri
 	plt.xticks( x_ticklabels)
 
 
-
-
-def __plotROC_projMult(newlocation, allsimparams, metaparams):
+def __plotROC_projMult(newlocation, somesimparams, metaparams, paramPathString):
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title='ROC')
 
-	y_labels = []
-	true_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
-	false_positive_rates = np.zeros((len(allsimparams), metaparams.numRepetitions));
-	for sid in xrange(len(allsimparams)):
-		simparams = allsimparams[sid]
-		y_labels.append(simparams.neurongroups.outputs.projMult)
-
-		for repetitionID in xrange(metaparams.numRepetitions):
-			repfolder = metaparams.repetitionFoldernames[repetitionID]
-			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
-			simdata = np.genfromtxt(stimdetfilename,
-									# names="time,tpr,fpr,t_div_f",
-									names="tpr,fpr,t_div_f",
-									comments='#',  # skip comment lines
-									dtype=None
-									)  # guess dtype of each column
-			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
-			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1];
-
+	true_positive_rates, false_positive_rates, y_label = helpers.results.read_result_data_1D(metaparams, somesimparams, paramPathString)
 	meanTPRs = true_positive_rates.mean(axis=1)
 	meanFPRs = false_positive_rates.mean(axis=1)
 
@@ -250,6 +193,5 @@ def __plotROC_projMult(newlocation, allsimparams, metaparams):
 	ax.tick_params(direction='out')
 	plt.xticks([0, 0.5, 1.0])
 	plt.yticks([0, 0.5, 1.0])
-
 
 
