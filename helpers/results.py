@@ -17,12 +17,47 @@ def read_result_data_1D(metaparams, somesimparams, paramdotpath):
 			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
 			simdata = np.genfromtxt(stimdetfilename,
 									# names="time,tpr,fpr,t_div_f",
-									names="tpr,fpr,t_div_f",
+									names="time,tpr,fpr,t_div_f",
 									comments='#',  # skip comment lines
 									dtype=None
 									)  # guess dtype of each column
 			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
 			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1];
+	return true_positive_rates, false_positive_rates, theTicks
+
+
+
+def read_SelectivityOnsetTime_1D(metaparams, somesimparams, paramdotpath):
+	theTicks = []
+	true_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions));
+	false_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions));
+	for sid in xrange(len(somesimparams)):
+		simparams = somesimparams[sid]
+		paramValue = helpers.parameters.getParamRecursively(paramdotpath, simparams)
+		theTicks.append(paramValue)
+
+		for repetitionID in xrange(metaparams.numRepetitions):
+			repfolder = metaparams.repetitionFoldernames[repetitionID]
+			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
+			simdata = np.genfromtxt(stimdetfilename,
+									# names="time,tpr,fpr,t_div_f",
+									names="time,tpr,fpr,t_div_f",
+									comments='#',  # skip comment lines
+									dtype=None
+									)  # guess dtype of each column
+			
+			tpfpDifferences = simdata['tpr'] - simdata['fpr']
+			
+			
+			
+			
+			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
+			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1];
+			
+			
+			
+			
+			
 	return true_positive_rates, false_positive_rates, theTicks
 
 

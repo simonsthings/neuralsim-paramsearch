@@ -12,9 +12,9 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	"""
 
 	extendedParams = dotmap.DotMap()
-	extendedParams.neurongroups.outputs.userecovery = [True,False]
+	#extendedParams.neurongroups.outputs.userecovery = [True,False]
 	#extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
-	extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
+	#extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
 	#extendedParams.neurongroups.outputs.projMult = np.r_[0.2:2.2:0.2]
 	#extendedParams.neurongroups.outputs.projMult = np.r_[2.2:4.2:0.2]
 	#extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
@@ -22,8 +22,8 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
 
-	#extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
-	extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
+	extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
+	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:8.2:0.2]
 
 	return extendedParams
@@ -50,12 +50,14 @@ def define_base_simulation_parameters(metaparams):
 	ms = 1e-3 # a millisecond.
 	simparams = dotmap.DotMap()
 	simparams.general.outfileprefix = metaparams.data_basename # dont need this: #+ "_repetition"+str(repetitionID+1)
-	simparams.general.testingProtocol.durations = [ 400 ]  #1500  #116  # seconds
-	simparams.general.testingProtocol.phasetypes = [1]  # 0=noise, 1=patterns, 2=test type A, 3=test type B, ...
-	#simparams.general.testingProtocol.durations = [300,300,900] # in seconds
-	#simparams.general.testingProtocol.phasetypes = [0,1,3] # 0=noise, 1=patterns, 2=test type A, 3=test type B, ...
+	#simparams.general.testingProtocol.durations = [ 400 ]  #1500  #116  # seconds
+	#simparams.general.testingProtocol.intervals = [0.2]  # patterns interval in seconds
+	simparams.general.testingProtocol.durations = [200,200] # in seconds
+	simparams.general.testingProtocol.intervals = [0.2,10] # patterns interval in seconds
+	#simparams.general.testingProtocol.durations = [100,100,200] # in seconds
+	#simparams.general.testingProtocol.intervals = [0.3,0.2,10] # patterns interval in seconds
 	simparams.general.simtime = sum(simparams.general.testingProtocol.durations)
-	simparams.recordings.detailedtracking = False
+	simparams.recordings.detailedtracking = True
 
 	simparams.neurongroups.inputs.N = 2000
 	
@@ -148,9 +150,9 @@ def define_meta_parameters(repeatLastName=False):
 	metaparams.executable_path = '../build/debug/examples/'
 	metaparams.executable_file = 'sim_json'
 	metaparams.datafig_basename = helpers.simulation.find_unique_foldername(basefolder,repeatLastName=repeatLastName)
-	metaparams.data_path = basefolder+metaparams.datafig_basename+'.data/'
+	metaparams.data_path = basefolder+metaparams.datafig_basename+'/data/'
 	metaparams.data_basename = metaparams.datafig_basename
-	metaparams.figures_path = basefolder+metaparams.datafig_basename+'.figures/'
+	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
 	metaparams.numRepetitions = 1
 	for repetitionID in xrange(metaparams.numRepetitions):

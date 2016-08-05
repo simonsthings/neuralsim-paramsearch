@@ -9,8 +9,9 @@ from SimonsPythonHelpers import nestedPrint
 
 def makeFig(params, paramdotpathX, paramdotpathY):
 
-	figtypename = 'TwoParams2D_Accuracy'
-
+	# extracting future figure file name from script file name:
+	scriptfilename = os.path.basename(__file__)
+	figtypename = scriptfilename[len('figuretype_'):scriptfilename.rfind('.py')] # may end on either .py or .pyc
 	print "Making figure type " + figtypename + " for parameters '" + paramdotpathY + "' versus '" + paramdotpathX + "'."
 
 	# make a copy of the list:

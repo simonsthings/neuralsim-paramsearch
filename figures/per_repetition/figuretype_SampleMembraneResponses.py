@@ -98,23 +98,23 @@ def makeFigs(params, paramFullPath=None):
 			simparams.figures[figtypename][repetitionID] = figPath[len(metaparams.figures_path):] + figName
 
 
-	# TODO: split this file into two figure types:
-	# simdata = __getSimData(metaparams.data_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename)
-	#         for mi in xrange(len(simparams.recordings.dtintervalsAsFloats.starttimes)):
-	#             starttime = simparams.recordings.dtintervalsAsFloats.starttimes[mi]
-	#             stoptime = simparams.recordings.dtintervalsAsFloats.stoptimes[mi]
-	#             timespan = (starttime,stoptime)  # seconds
-	#             print "Now drawing membrane and raster plot figure for timespan " + str(timespan) + ""
-	#             figSpikesAndMembranes = plt.figure()
-	#             __plotInputraster(axesdims,simdata,timespan)
-	#             __plotMembranes(axesdims,simdata,timespan)
-	#             __plotAmpa(axesdims,simdata,timespan)
-	#             #__plotNmda(axesdims,simdata,timespan)
-	#             __plotOutputraster(axesdims,simdata,timespan)
-	#             figSpikesAndMembranes.savefig(metaparams.figures_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename+'_SpikesAndMembranes_start'+str(starttime)+'s.png')
-	#             #plt.show() ; exit()
-	#             plt.close(figSpikesAndMembranes)
-	#
+		# TODO: split this file into two figure types:
+		simdata = __getSimData(metaparams.data_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename)
+		for mi in xrange(len(simparams.recordings.dtintervalsAsFloats.starttimes)):
+			starttime = simparams.recordings.dtintervalsAsFloats.starttimes[mi]
+			stoptime = simparams.recordings.dtintervalsAsFloats.stoptimes[mi]
+			timespan = (starttime,stoptime)  # seconds
+			print "Now drawing membrane and raster plot figure for timespan " + str(timespan) + ""
+			figSpikesAndMembranes = plt.figure()
+			__plotInputraster(axesdims,simdata,timespan)
+			__plotMembranes(axesdims,simdata,timespan)
+			__plotAmpa(axesdims,simdata,timespan)
+			#__plotNmda(axesdims,simdata,timespan)
+			__plotOutputraster(axesdims,simdata,timespan)
+			figSpikesAndMembranes.savefig(metaparams.figures_path+simparams.extendedparamFoldername+'/'+repfolder+'/'+metaparams.figures_basename+'_SpikesAndMembranes_start'+str(starttime)+'s.png')
+			#plt.show() ; exit()
+			plt.close(figSpikesAndMembranes)
+	
 
 	__make_html(allsimparams, metaparams, figtypename, paramGroupString, paramFullPath)
 

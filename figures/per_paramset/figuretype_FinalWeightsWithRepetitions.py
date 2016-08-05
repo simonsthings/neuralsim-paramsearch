@@ -7,8 +7,9 @@ from dotmap import DotMap
 
 def makeFigs(params, paramFullPath=None):
 
-	figtypename = 'FinalWeightsWithRepetitions'
-
+	# extracting future figure file name from script file name:
+	scriptfilename = os.path.basename(__file__)
+	figtypename = scriptfilename[len('figuretype_'):scriptfilename.rfind('.py')] # may end on either .py or .pyc
 	print "Making figure type "+figtypename+" for all parameters."
 
 	allsimparams = params.allsimparams

@@ -8,7 +8,7 @@ from SimonsPythonHelpers import nestedPrint
 
 
 def makeFig(params, paramdotpath):
-
+	
 	# extracting future figure file name from script file name:
 	scriptfilename = os.path.basename(__file__)
 	figtypename = scriptfilename[len('figuretype_'):scriptfilename.rfind('.py')] # may end on either .py or .pyc

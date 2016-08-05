@@ -8,6 +8,7 @@ def run_simulation(params ,wetRun=True):
 	allsimparams = params.allsimparams
 	metaparams = params.metaparams
 
+	initialDir = os.path.abspath(os.curdir)
 	if not os.path.exists(metaparams.data_path):
 		os.makedirs(metaparams.data_path)
 	os.chdir(metaparams.data_path)
@@ -85,9 +86,9 @@ def run_simulation(params ,wetRun=True):
 			# if (repetitionID+1 == metaparams.numRepetitions) and (paramsetID+1 == numParameterSets):
 			#    theRedirectString = ""
 
-			theCmdString += "( cd " + paramsetFoldername + '/' + repfolder + " ; " + '../../../../' + metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd ../../.. ) &'
+			theCmdString += "( cd " + paramsetFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
 
-			simString = " cd " + paramsetFoldername + '/' + repfolder + " ; " + '../../../../' + metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd ../../..  \n'
+			simString = " cd " + paramsetFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
 			parjobfile.write(simString)
 
 		os.chdir('..')
@@ -113,7 +114,7 @@ def run_simulation(params ,wetRun=True):
 	else:
 		print "Skipping sims!"  # dry run
 
-	os.chdir('../..')
+	os.chdir(initialDir)
 
 	pass
 
@@ -138,7 +139,11 @@ def find_unique_foldername(basefolder='', repeatLastName=False):
 	if daylist:
 		for foldername in daylist:
 			lastdotID = str(foldername).rfind('.')
-			trialIDstring = foldername[len(daystamp)+len('_trial'):lastdotID]
+			## stopped using dot-separator for data vs figures dirs. Now just using subdirs. But need an if clause because of that now:
+			if lastdotID > 0:
+				trialIDstring = foldername[len(daystamp)+len('_trial'):lastdotID]
+			else:
+				trialIDstring = foldername[len(daystamp)+len('_trial'):]
 			largestID = max(largestID,int(trialIDstring))
 	#else:
 		#print "no files matching '"+daystamp+"' found in "+ str(os.path.abspath(os.curdir))
