@@ -55,15 +55,15 @@ def makeFig(params, paramdotpathX, paramdotpathY):
 def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, paramdotpathY, figtypename):
 
 	metaparams = params.metaparams
-
-	shortParamStringX = helpers.parameters.getDependentParameterShortNameString(params,paramdotpathX)
-	shortParamStringY = helpers.parameters.getDependentParameterShortNameString(params,paramdotpathY)
-
+	
+	shortParamStringX = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathX)
+	shortParamStringY = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathY)
+	
 	figBlob = figtypename + '_' + shortParamStringX+'VS'+shortParamStringY
 	figPath = metaparams.figures_path + 'figtype_' + figBlob + '/'
 	os.system('mkdir -p ' + figPath)
 
-	true_positive_rates, false_positive_rates, xTicks, yTicks = helpers.results.read_result_data_2D(params, somesimparams, paramdotpathX, paramdotpathY)
+	true_positive_rates, false_positive_rates, xTicks, yTicks = helpers.results.read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY)
 
 	fs = (20 ,6)
 	axesdims = dotmap.DotMap()
@@ -79,7 +79,10 @@ def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, param
 
 	figAccuracies = plt.figure(figsize=fs)
 
-	_plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTicks, shortParamStringX, shortParamStringY)
+	readableParamStringX = helpers.parameters.getReadableParamString(params, paramdotpathX)
+	readableParamStringY = helpers.parameters.getReadableParamString(params, paramdotpathY)
+
+	_plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTicks, readableParamStringX, readableParamStringY)
 
 	#__plotAccuracies_param1_Repetitions(location1, somesimparams, metaparams, 'tpr', paramdotpath)
 	#__plotAccuracies_param1_Repetitions(location2, somesimparams, metaparams, 'fpr', paramdotpath)
@@ -91,7 +94,7 @@ def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, param
 	plt.close(figAccuracies)
 
 
-def _plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTicks, shortParamStringX, shortParamStringY):
+def _plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTicks, readableLabelX, readableLabelY):
 
 	meanTPRs = true_positive_rates.mean(axis=2)
 	meanFPRs = false_positive_rates.mean(axis=2)
@@ -100,11 +103,6 @@ def _plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTic
 
 	#sensitivityIndex = (meanTPRs - meanFPRs) / np.sqrt( 0.5 * (varTPRs + varFPRs) ) # from e.g. https://en.wikipedia.org/wiki/Sensitivity_and_specificity
 	cheapAccuracy = meanTPRs - meanFPRs
-
-	readableLabelX = shortParamStringX.replace('WITH',' (with ').replace('AND',' and ')
-	readableLabelY = shortParamStringY.replace('WITH',' (with ').replace('AND',' and ')
-	readableLabelX = readableLabelX+')' if not readableLabelX == shortParamStringX else readableLabelX
-	readableLabelY = readableLabelY+')' if not readableLabelY == shortParamStringY else readableLabelY
 
 	location = [axesdims.x1, axesdims.y1, axesdims.w1, axesdims.h1]
 	fig = plt.gcf()

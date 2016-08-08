@@ -58,98 +58,85 @@ def makeFig(params, paramdotpath):
 
 
 def __doThePlotting(params, somesimparams, paramGroupString, paramFullPath, figtypename):
-
 	metaparams = params.metaparams
-
+	
 	shortParamString = helpers.parameters.getDependentParameterShortNameString(params, paramFullPath)
-
+	
 	figBlob = figtypename + '_' + shortParamString
 	figPath = metaparams.figures_path + 'figtype_' + figBlob + '/'
 	if not os.path.exists(figPath):
 		os.makedirs(figPath)
-
-	#axesdims = dotmap.DotMap()
-	fs = (12 ,8)
-	#location1 = [0.1 ,0.45 ,0.28 ,0.45]
-	#location2 = [0.55 ,0.45 ,0.28 ,0.45]
-	location1 = [0.1 ,0.75 ,0.65 ,0.2]
-	location2 = [0.1 ,0.42 ,0.65 ,0.2]
-	location3 = [0.1 ,0.09 ,0.65 ,0.2]
-	location4 = [0.85 ,0.09 , 0.2 /fs[0 ] *fs[1] ,0.2]
-
+	
+	# axesdims = dotmap.DotMap()
+	fs = (12, 8)
+	# location1 = [0.1 ,0.45 ,0.28 ,0.45]
+	# location2 = [0.55 ,0.45 ,0.28 ,0.45]
+	location1 = [0.1, 0.75, 0.65, 0.2]
+	location2 = [0.1, 0.42, 0.65, 0.2]
+	location3 = [0.1, 0.09, 0.65, 0.2]
+	location4 = [0.85, 0.09, 0.2 / fs[0] * fs[1], 0.2]
+	
 	figAccuracies = plt.figure(figsize=fs)
-
-	__plotAccuracies_param1_Repetitions(location1, somesimparams, metaparams, 'tpr', paramFullPath)
-	__plotAccuracies_param1_Repetitions(location2, somesimparams, metaparams, 'fpr', paramFullPath)
-	__plotTPRvsFPR_projMult(location3, somesimparams, metaparams, paramFullPath)
-	__plotROC_projMult(location4, somesimparams, metaparams, paramFullPath)
-
+	
+	theTicks, true_positive_rates, false_positive_rates, sufficientSelectivitySpecificityOnsets = helpers.results.read_1D_result_data(metaparams, somesimparams,paramFullPath)
+	readableParamString = helpers.parameters.getReadableParamString(params, paramFullPath)
+	
+	__plotAccuracies_param1_Repetitions(location1, readableParamString, metaparams.numRepetitions, 'true positive rate', true_positive_rates, theTicks)
+	__plotAccuracies_param1_Repetitions(location2, readableParamString, metaparams.numRepetitions, 'false positive rate', false_positive_rates, theTicks)
+	__plotTPRvsFPR_projMult(location3, true_positive_rates, false_positive_rates, theTicks, paramFullPath)
+	__plotROC_projMult(location4, true_positive_rates, false_positive_rates, theTicks, paramFullPath)
+	
 	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
 	figAccuracies.savefig(figPath + figName + '.png')
 	plt.close(figAccuracies)
 
 
-def __plotAccuracies_param1_Repetitions(newlocation, somesimparams, metaparams, columnToUse, paramPathString):
-	from helpers.parameters import getParamRecursively
-
+def __plotAccuracies_param1_Repetitions(newlocation, readableParamString, numRepetitions, tprfprString, tpfp_rates, x_ticklabels):
 	fig = plt.gcf()
-	tprfprString = 'true positive rate'
-	if columnToUse == 'fpr':
-		tprfprString = 'false positive rate'
-
-	ax = fig.add_axes(newlocation, title='(final) ' + tprfprString + ' (x' + str(metaparams.numRepetitions) + ')')
-
-
-	true_positive_rates, false_positive_rates, x_ticklabels = helpers.results.read_result_data_1D(metaparams, somesimparams, paramPathString)
-
-	if columnToUse == 'tpr':
-		plt.imshow(true_positive_rates.T, aspect='auto', interpolation='nearest')
-	elif columnToUse == 'fpr':
-		plt.imshow(false_positive_rates.T, aspect='auto', interpolation='nearest')
-	else:
-		raise ValueError('Unknown column type: ' + str(columnToUse))
+	ax = fig.add_axes(newlocation, title='(final) ' + tprfprString + ' (x' + str(numRepetitions) + ')')
+	
+	plt.imshow(tpfp_rates.T, aspect='auto', interpolation='nearest')
+	
 	# plt.colorbar()
 	plt.clim(0, 1)
-
-	theYticks = arange(metaparams.numRepetitions)
+	
+	theYticks = arange(numRepetitions)
 	plt.yticks(theYticks, theYticks + 1)
-
+	
 	plt.ylabel('repetitions')
-	paramShortID = paramPathString.rfind('.')
-	paramShortString = paramPathString[paramShortID + 1:]
-	plt.xlabel(paramShortString)
+	plt.xlabel(readableParamString)
 	plt.xticks(np.r_[0:len(x_ticklabels)], x_ticklabels)
-
+	
+	# not the prettiest of workarounds, but whatever:
 	currentXTicks = plt.xticks()
 	if len(x_ticklabels) > 10:
-		idx = np.r_[1:len(x_ticklabels):round(len(x_ticklabels)/10)].astype(int)
-		#print "idx: " + str(idx)
+		idx = np.r_[1:len(x_ticklabels):round(len(x_ticklabels) / 10)].astype(int)
+		# print "idx: " + str(idx)
 		for id in idx:
 			currentXTicks[1][id]._text = ''
-	plt.xticks( *currentXTicks)
-
+	plt.xticks(*currentXTicks)
+	
 	# now show the means:
-
-	#meanlocation = list(newlocation)
-	#meanlocation[0] = newlocation[0] + newlocation[2] + 0.02
-	#meanlocation[2] = newlocation[2] / metaparams.numRepetitions
-	#ax2 = fig.add_axes(meanlocation, title='mean')
-
-	#meanSomethingRates = true_positive_rates.mean(axis=1)
-	#plt.imshow(np.expand_dims(meanSomethingRates, axis=1), aspect='auto')
-	#plt.xticks([])
-	#plt.yticks([])
+	
+	# meanlocation = list(newlocation)
+	# meanlocation[0] = newlocation[0] + newlocation[2] + 0.02
+	# meanlocation[2] = newlocation[2] / metaparams.numRepetitions
+	# ax2 = fig.add_axes(meanlocation, title='mean')
+	
+	# meanSomethingRates = true_positive_rates.mean(axis=1)
+	# plt.imshow(np.expand_dims(meanSomethingRates, axis=1), aspect='auto')
+	# plt.xticks([])
+	# plt.yticks([])
 	pass
 
 
-def __plotTPRvsFPR_projMult(newlocation, somesimparams, metaparams, paramPathString):
+def __plotTPRvsFPR_projMult(newlocation, true_positive_rates, false_positive_rates, x_ticklabels, paramPathString):
 	from helpers.parameters import getParamRecursively
 
 	fig = plt.gcf()
 	lastax = plt.gca()
 	ax = fig.add_axes(newlocation, title='final TPR vs. FPR over projMults')
 
-	true_positive_rates, false_positive_rates, x_ticklabels = helpers.results.read_result_data_1D(metaparams, somesimparams, paramPathString)
 	meanTPRs = true_positive_rates.mean(axis=1)
 	meanFPRs = false_positive_rates.mean(axis=1)
 	stdTPRs = true_positive_rates.std(axis=1)
@@ -179,11 +166,10 @@ def __plotTPRvsFPR_projMult(newlocation, somesimparams, metaparams, paramPathStr
 	plt.xticks( x_ticklabels)
 
 
-def __plotROC_projMult(newlocation, somesimparams, metaparams, paramPathString):
+def __plotROC_projMult(newlocation, true_positive_rates, false_positive_rates, y_label, paramPathString):
 	fig = plt.gcf()
 	ax = fig.add_axes(newlocation, title='ROC')
 
-	true_positive_rates, false_positive_rates, y_label = helpers.results.read_result_data_1D(metaparams, somesimparams, paramPathString)
 	meanTPRs = true_positive_rates.mean(axis=1)
 	meanFPRs = false_positive_rates.mean(axis=1)
 

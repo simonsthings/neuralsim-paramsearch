@@ -22,8 +22,8 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
 
-	extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
-	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
+	#extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
+	extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:8.2:0.2]
 
 	return extendedParams
@@ -57,7 +57,7 @@ def define_base_simulation_parameters(metaparams):
 	#simparams.general.testingProtocol.durations = [100,100,200] # in seconds
 	#simparams.general.testingProtocol.intervals = [0.3,0.2,10] # patterns interval in seconds
 	simparams.general.simtime = sum(simparams.general.testingProtocol.durations)
-	simparams.recordings.detailedtracking = True
+	simparams.recordings.detailedtracking = False
 
 	simparams.neurongroups.inputs.N = 2000
 	
@@ -154,7 +154,7 @@ def define_meta_parameters(repeatLastName=False):
 	metaparams.data_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 1
+	metaparams.numRepetitions = 10
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
@@ -166,6 +166,10 @@ def make_figures(params):
 		figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
 		figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
 		figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
+
+		figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
+		figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
+		figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
 
 		# figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
 		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')

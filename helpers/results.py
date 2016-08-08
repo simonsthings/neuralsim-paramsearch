@@ -3,10 +3,22 @@ import helpers
 #from SimonsPythonHelpers import nestedPrint
 
 
-def read_result_data_1D(metaparams, somesimparams, paramdotpath):
+def read_1D_Accuracy(metaparams, somesimparams, paramdotpath):
+	(theTicks, true_positive_rates, false_positive_rates, sufficientSelectivitySpecificityOnsets) = read_1D_result_data(metaparams, somesimparams, paramdotpath)
+	return true_positive_rates, false_positive_rates, theTicks
+
+
+#def read_1D_SelectivityOnsetTime(metaparams, somesimparams, paramdotpath):
+#	(theTicks, true_positive_rates, false_positive_rates, sufficientSelectivitySpecificityOnsets) = read_1D_result_data(metaparams, somesimparams, paramdotpath)
+#	return theTicks, sufficientSelectivitySpecificityOnsets
+
+
+def read_1D_result_data(metaparams, somesimparams, paramdotpath):
 	theTicks = []
-	true_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions));
-	false_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions));
+	true_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions))
+	false_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions))
+	sufficientSelectivitySpecificityOnsets = np.zeros((len(somesimparams), metaparams.numRepetitions))
+	
 	for sid in xrange(len(somesimparams)):
 		simparams = somesimparams[sid]
 		paramValue = helpers.parameters.getParamRecursively(paramdotpath, simparams)
@@ -17,58 +29,34 @@ def read_result_data_1D(metaparams, somesimparams, paramdotpath):
 			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
 			simdata = np.genfromtxt(stimdetfilename,
 									# names="time,tpr,fpr,t_div_f",
-									names="time,tpr,fpr,t_div_f",
-									comments='#',  # skip comment lines
-									dtype=None
-									)  # guess dtype of each column
-			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
-			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1];
-	return true_positive_rates, false_positive_rates, theTicks
-
-
-
-def read_SelectivityOnsetTime_1D(metaparams, somesimparams, paramdotpath):
-	theTicks = []
-	true_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions));
-	false_positive_rates = np.zeros((len(somesimparams), metaparams.numRepetitions));
-	for sid in xrange(len(somesimparams)):
-		simparams = somesimparams[sid]
-		paramValue = helpers.parameters.getParamRecursively(paramdotpath, simparams)
-		theTicks.append(paramValue)
-
-		for repetitionID in xrange(metaparams.numRepetitions):
-			repfolder = metaparams.repetitionFoldernames[repetitionID]
-			stimdetfilename = metaparams.data_path + simparams.extendedparamFoldername + '/' + repfolder + '/' + metaparams.figures_basename + '.stimulusdetectionstatistics.txt'
-			simdata = np.genfromtxt(stimdetfilename,
-									# names="time,tpr,fpr,t_div_f",
-									names="time,tpr,fpr,t_div_f",
+									names="time,tpr,fpr,tprMinusfpr,tprDivfpr",
 									comments='#',  # skip comment lines
 									dtype=None
 									)  # guess dtype of each column
 			
-			tpfpDifferences = simdata['tpr'] - simdata['fpr']
+			requestedMinimumDistance = 0.7
+			firstGoodRow = -1
+			for row in xrange(len(simdata['time'])-1,-1,-1):
+				if (simdata['tprMinusfpr'][row]) > requestedMinimumDistance :
+					firstGoodRow = row
 			
+			thetime = simdata['time'][firstGoodRow]
 			
-			
-			
-			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1];
-			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1];
-			
-			
-			
-			
-			
-	return true_positive_rates, false_positive_rates, theTicks
+			true_positive_rates[sid, repetitionID] = simdata['tpr'][-1]
+			false_positive_rates[sid, repetitionID] = simdata['fpr'][-1]
+			sufficientSelectivitySpecificityOnsets[sid, repetitionID] = thetime
+		
+	return theTicks, true_positive_rates, false_positive_rates, sufficientSelectivitySpecificityOnsets
 
 
 
-def read_result_data_2D(params, somesimparams, paramdotpathX, paramdotpathY):
+def read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY):
 
 	xTicks = np.array(params.flatParamLists[paramdotpathX])
 	yTicks = np.array(params.flatParamLists[paramdotpathY])
 
-	true_positive_rates = np.zeros((len(xTicks), len(yTicks), params.metaparams.numRepetitions));
-	false_positive_rates = np.zeros((len(xTicks), len(yTicks), params.metaparams.numRepetitions));
+	true_positive_rates = np.zeros((len(xTicks), len(yTicks), params.metaparams.numRepetitions))
+	false_positive_rates = np.zeros((len(xTicks), len(yTicks), params.metaparams.numRepetitions))
 
 	for sid in xrange(len(somesimparams)):
 		simparams = somesimparams[sid]
@@ -87,8 +75,8 @@ def read_result_data_2D(params, somesimparams, paramdotpathX, paramdotpathY):
 									comments='#',  # skip comment lines
 									dtype=None
 									)  # guess dtype of each column
-			true_positive_rates[xIndex, yIndex, repetitionID] = simdata['tpr'][-1];
-			false_positive_rates[xIndex, yIndex, repetitionID] = simdata['fpr'][-1];
+			true_positive_rates[xIndex, yIndex, repetitionID] = simdata['tpr'][-1]
+			false_positive_rates[xIndex, yIndex, repetitionID] = simdata['fpr'][-1]
 
 	return true_positive_rates, false_positive_rates, xTicks, yTicks
 

@@ -1,4 +1,3 @@
-datafig/
-.idea/
 datafig*/
+.idea/
 **/*.pyc

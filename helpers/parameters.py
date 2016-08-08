@@ -296,7 +296,14 @@ def getDependentParameterShortNameString(params,paramdotpath):
 	return shortParamString
 
 
+def getReadableParamString(params,paramdotpath):
+	
+	dependentParamString = getDependentParameterShortNameString(params, paramdotpath)
+	
+	readableParamString = dependentParamString.replace('WITH',' (with ').replace('AND',' and ')
+	readableParamString = readableParamString+')' if not readableParamString == dependentParamString else readableParamString
 
+	return readableParamString
 
 
 
