@@ -83,7 +83,7 @@ def __doThePlotting(params, somesimparams, paramGroupString, paramFullPath, figt
 	
 	__plotAccuracies_param1_Repetitions(location1, readableParamString, metaparams.numRepetitions, 'true positive rate', true_positive_rates, theTicks)
 	__plotAccuracies_param1_Repetitions(location2, readableParamString, metaparams.numRepetitions, 'false positive rate', false_positive_rates, theTicks)
-	__plotTPRvsFPR_projMult(location3, true_positive_rates, false_positive_rates, theTicks, paramFullPath)
+	__plotTPRvsFPR_projMult(location3, true_positive_rates, false_positive_rates, theTicks, paramFullPath,readableParamString)
 	__plotROC_projMult(location4, true_positive_rates, false_positive_rates, theTicks, paramFullPath)
 	
 	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
@@ -130,12 +130,15 @@ def __plotAccuracies_param1_Repetitions(newlocation, readableParamString, numRep
 	pass
 
 
-def __plotTPRvsFPR_projMult(newlocation, true_positive_rates, false_positive_rates, x_ticklabels, paramPathString):
+def __plotTPRvsFPR_projMult(newlocation, true_positive_rates, false_positive_rates, x_ticklabels, paramPathString, readableParamString):
 	from helpers.parameters import getParamRecursively
 
+	paramShortID = paramPathString.rfind('.')
+	paramShortString = paramPathString[paramShortID + 1:]
+	
 	fig = plt.gcf()
 	lastax = plt.gca()
-	ax = fig.add_axes(newlocation, title='final TPR vs. FPR over projMults')
+	ax = fig.add_axes(newlocation, title='final TPR vs. FPR over '+paramShortString)
 
 	meanTPRs = true_positive_rates.mean(axis=1)
 	meanFPRs = false_positive_rates.mean(axis=1)
@@ -153,9 +156,7 @@ def __plotTPRvsFPR_projMult(newlocation, true_positive_rates, false_positive_rat
 	plt.plot(x_ticklabels, meanFPRs, label='final false positive rate',linewidth=2.0)
 	plt.ylim([-0.1, 1.1])
 	plt.xlim([xmin,xmax])
-	paramShortID = paramPathString.rfind('.')
-	paramShortString = paramPathString[paramShortID + 1:]
-	plt.xlabel(paramShortString)
+	plt.xlabel(readableParamString)
 	plt.ylabel('tp or fp rate')
 	plt.legend(fontsize=8, loc='center left')
 

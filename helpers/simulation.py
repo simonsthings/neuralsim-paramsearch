@@ -23,6 +23,16 @@ def run_simulation(params ,wetRun=True):
 		theRedirectString = ' 1> stdout.txt 2> stderr.txt'
 
 
+	print "There are " +str(len(params.flatParamLists.keys()))+" parameter sets to be evaluated:"
+	for flatParamString in params.flatParamLists.keys():
+		paramList = params.flatParamLists[flatParamString]
+		print '- ' + flatParamString + ': ' + str(len(paramList)) + ' values'
+
+	print "Also, " +str(len(params.dependentParams.keys()))+" parameters depend on others:"
+	for dependentParamString in params.dependentParams.keys():
+		paramList = params.dependentParams[dependentParamString]
+		print '- ' + dependentParamString + ': ' + str(paramList) + ' '
+
 	summaryText = "Now running " \
 			  + str(numParameterSets * metaparams.numRepetitions) \
 			  + " parallel jobs, consisting of " \
@@ -35,17 +45,6 @@ def run_simulation(params ,wetRun=True):
 		print summaryText + " Screen output redirected to stdout.txt and stderr.txt to avoid terminal confusion."
 	else:
 		print summaryText + " Showing screen output here."
-
-	print "There are " +str(len(params.flatParamLists.keys()))+" parameter sets to be evaluated:"
-	for flatParamString in params.flatParamLists.keys():
-		paramList = params.flatParamLists[flatParamString]
-		print '- ' + flatParamString + ': ' + str(len(paramList)) + ' values'
-
-	print "Also, " +str(len(params.dependentParams.keys()))+" parameters depend on others:"
-	for dependentParamString in params.dependentParams.keys():
-		paramList = params.dependentParams[dependentParamString]
-		print '- ' + dependentParamString + ': ' + str(paramList) + ' '
-
 
 
 
@@ -75,6 +74,7 @@ def run_simulation(params ,wetRun=True):
 			
 			simparams.repetitionID = repetitionID
 			simparams.neurongroups.inputs.randomseed = int(random.randint(0, 2 ** 30))  # long(time.time())
+			#simparams.neurongroups.inputs.randomseed = 1043771618
 			paramfile = open(repfolder + '/settings_simulation.json', 'w')
 			json.dump(simparams.toDict(), paramfile, sort_keys=True, indent=4, separators=(',', ': '))
 			paramfile.close()
@@ -108,11 +108,12 @@ def run_simulation(params ,wetRun=True):
 
 
 	if wetRun:
+		print "Writing data to '"+params.metaparams.datafig_basename+"'..."
 		gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog.txt :::: par_jobs.txt"
 		os.system(gnuParallelCmdString)
 		# os.system(theCmdString)
 	else:
-		print "Skipping sims!"  # dry run
+		print "Skipping sims! (Using data in '"+params.metaparams.datafig_basename+"' instead!)"  # dry run
 
 	os.chdir(initialDir)
 

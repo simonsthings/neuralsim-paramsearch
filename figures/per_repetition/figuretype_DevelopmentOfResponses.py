@@ -6,7 +6,7 @@ from numpy import int32, arange
 import peakutils
 
 
-def makeFigs(params, paramFullPath=None):
+def makeFigs(params, paramFullPath=None, plotDevelopmentOfWeights=False):
 
 	# extracting future figure file name from script file name:
 	scriptfilename = os.path.basename(__file__)
@@ -59,7 +59,7 @@ def makeFigs(params, paramFullPath=None):
 
 			# print "Drawing weight development figure for repetition "+str(repetitionID)+" in folder "+simparams.extendedparamFoldername+"."
 			figWeightsDevelopment = plt.figure(figsize=(9, 11))
-			if False:
+			if plotDevelopmentOfWeights:
 				weightdata = __readWeightsFromFiles(simparams, metaparams, repfolder)
 				(axBounds, axXlim) = __plotWeights(axesdims, simparams, weightdata)
 				axesdims.figWeights.x2 = axBounds[0]
