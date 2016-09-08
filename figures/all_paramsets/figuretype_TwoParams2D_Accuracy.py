@@ -81,14 +81,16 @@ def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, param
 
 	readableParamStringX = helpers.parameters.getReadableParamString(params, paramdotpathX)
 	readableParamStringY = helpers.parameters.getReadableParamString(params, paramdotpathY)
-
+	
 	_plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTicks, readableParamStringX, readableParamStringY)
 
 	#__plotAccuracies_param1_Repetitions(location1, somesimparams, metaparams, 'tpr', paramdotpath)
 	#__plotAccuracies_param1_Repetitions(location2, somesimparams, metaparams, 'fpr', paramdotpath)
 	#__plotTPRvsFPR_projMult(location3, somesimparams, metaparams, paramdotpath)
 	#__plotROC_projMult(location4, somesimparams, metaparams)
-
+	
+	figAccuracies.text(0.05,0.97,paramGroupString)
+	
 	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
 	figAccuracies.savefig(figPath + figName + '.png')
 	plt.close(figAccuracies)

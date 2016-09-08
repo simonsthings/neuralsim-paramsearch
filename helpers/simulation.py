@@ -162,7 +162,39 @@ def find_unique_foldername(basefolder='', repeatLastName=False):
 
 
 
+def rerun_missing_simulations(params,wetRun=True):
+		
+	initialDir = os.path.abspath(os.curdir)
+	os.chdir(params.metaparams.data_path)
 
+	missingparjobfile = open('par_jobs_repeatmissing.txt', 'w')
 
+	missing_counter = 0
+	with open('par_jobs.txt', 'r') as parjobfile:
+		for line in parjobfile:
+			startString = '--settingsfile '
+			endString = 'settings_simulation.json'
+			resultsfolderpathStart = line.find(startString)
+			resultsfolderpathEnd = line.rfind(endString)
+			resultsfolderPath = line[(resultsfolderpathStart+len(startString)):resultsfolderpathEnd]
+			
+			if not os.path.isfile(resultsfolderPath+params.metaparams.datafig_basename+'.stimulusdetectionstatistics.txt'):
+				print resultsfolderPath + ' has no file ending on ...stimulusdetectionstatistics.txt'
+				missingparjobfile.write(line)
+				missing_counter += 1
+	
+	missingparjobfile.close()
+	
+	
+	if wetRun:
+		if missing_counter>0:
+			print "Now re-running "+str(missing_counter)+" sims of '"+params.metaparams.datafig_basename+"' that somehow didn't succeed in the first run..."
+			gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog_missing.txt :::: par_jobs_repeatmissing.txt"
+			os.system(gnuParallelCmdString)
+			# os.system(theCmdString)
+
+	os.chdir(initialDir)
+
+	pass
 
 

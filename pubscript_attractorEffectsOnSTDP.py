@@ -12,22 +12,25 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	"""
 
 	extendedParams = dotmap.DotMap()
-	#extendedParams.neurongroups.outputs.userecovery = [True,False]
-	
+	extendedParams.neurongroups.outputs.userecovery = [True,False]
 	#extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
-	
 	#extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 	#extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
-
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
-
 	#extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
+	#extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 0.75 , 1.0 , 1.25 ,  1.5 , 1.75 , 2.0]) # eta in Auryn
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:8.2:0.2]
 	
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.r_[0.0:1.2:0.1]
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.r_[-1.0:1.2:0.1]
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 , 0.05 , 0.075 , 0.1 , 0.2 , 0.3 , 0.4 , 0.5]
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.r_[0.0:0.52:0.025]
+	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=21)
+	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
+
+	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
+	extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=21)
 
 	return extendedParams
 
@@ -42,8 +45,8 @@ def define_dependent_simulation_parameters():
 
 	#dependentParams['connectionsets.con1.initialweight'] = [ ('mul', 'connectionsets.con1.maximumweight' ,'*', 1.0) , ('mul', 'connectionsets.con1.stdprule.learningrate' ,'*', 32.0)]
 
-	dependentParams['connectionsets.con1.stdprule.learningrate'] = [ ('mul','connectionsets.con1.maximumweight' ,'*', 1.0) ]
-	dependentParams['connectionsets.con1.initialweight']         = [ ('mul','connectionsets.con1.maximumweight' ,'*', 1.0) ]
+	#dependentParams['connectionsets.con1.stdprule.learningrate'] = [ ('mul','connectionsets.con1.maximumweight' ,'*', 1.0) ]
+	#dependentParams['connectionsets.con1.initialweight']         = [ ('mul','connectionsets.con1.maximumweight' ,'*', 1.0) ]
 
 	return dependentParams
 
@@ -53,12 +56,12 @@ def define_base_simulation_parameters(metaparams):
 	ms = 1e-3 # a millisecond.
 	simparams = dotmap.DotMap()
 	simparams.general.outfileprefix = metaparams.data_basename # dont need this: #+ "_repetition"+str(repetitionID+1)
-	simparams.general.testingProtocol.durations = [400] # [ 400 ]  #1500  #116  # seconds
+	simparams.general.testingProtocol.durations = [400]  #1500  #116  # seconds
 	simparams.general.testingProtocol.intervals = [0.2]  # patterns interval in seconds
-	#simparams.general.testingProtocol.durations = [200,200] # in seconds
+	#simparams.general.testingProtocol.durations = [400,1000] # in seconds
 	#simparams.general.testingProtocol.intervals = [0.2,10] # patterns interval in seconds
-	#simparams.general.testingProtocol.durations = [100,100,200] # in seconds
-	#simparams.general.testingProtocol.intervals = [0.3,0.2,10] # patterns interval in seconds
+	#simparams.general.testingProtocol.durations = [300,300,900] # in seconds
+	#simparams.general.testingProtocol.intervals = [9999,0.2,10] # patterns interval in seconds
 	simparams.general.simtime = sum(simparams.general.testingProtocol.durations)
 	simparams.recordings.detailedtracking = False
 
@@ -71,7 +74,7 @@ def define_base_simulation_parameters(metaparams):
 	
 	# only needed by PoissonGroup and StructuredPoissonGroup:
 	simparams.neurongroups.inputs.rate = 10 # Hz
-	simparams.neurongroups.inputs.randomseed = 1459350219 # will be redefined in run_simulation()
+	simparams.neurongroups.inputs.randomseed = -1 # will be redefined in run_simulation()
 	# only needed by FileInputGroup:
 	simparams.neurongroups.inputs.rasfilename = '../sim_simon1.data/simon1_fileinputs.ras'
 	# only needed by StructuredPoissonGroup and PolychronousPoissonGroup:
@@ -102,17 +105,17 @@ def define_base_simulation_parameters(metaparams):
 	#simparams.connectionsets.con1.type = "STDPConnection"
 	simparams.connectionsets.con1.type = "GeneralAlltoallSTDPConnection"
 
-#     simparams.connectionsets.con1.stdprule.A_plus = 0.588
-#     simparams.connectionsets.con1.stdprule.A_minus = -1
-#     simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
-#     simparams.connectionsets.con1.stdprule.tau_minus = 28.6 *ms #22e-3
-#     simparams.connectionsets.con1.stdprule.learningrate = 0.0325 *1 # eta in Auryn
+	simparams.connectionsets.con1.stdprule.A_plus = 0.588
+	simparams.connectionsets.con1.stdprule.A_minus = -1
+	simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
+	simparams.connectionsets.con1.stdprule.tau_minus = 28.6 *ms #22e-3
+	simparams.connectionsets.con1.stdprule.learningrate = 0.0325 *1 # eta in Auryn
 		
-	simparams.connectionsets.con1.stdprule.A_plus = 1
-	simparams.connectionsets.con1.stdprule.A_minus = -0.85
-	simparams.connectionsets.con1.stdprule.tau_plus = 16.8 *ms
-	simparams.connectionsets.con1.stdprule.tau_minus = 33.7 *ms #22e-3
-	simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
+#	simparams.connectionsets.con1.stdprule.A_plus = 1
+#	simparams.connectionsets.con1.stdprule.A_minus = -0.85
+#	simparams.connectionsets.con1.stdprule.tau_plus = 16.8 *ms
+#	simparams.connectionsets.con1.stdprule.tau_minus = 33.7 *ms #22e-3
+#	simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
 
 	#simparams.connectionsets.con1.stdprule.weightdependence.type = "AdditiveWeightDependence"
 	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearWeightDependence"
@@ -173,7 +176,7 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams.data_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 10
+	metaparams.numRepetitions = 1
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
@@ -181,20 +184,9 @@ def define_meta_parameters(existingSimfoldername=None):
 
 def make_figures(params):
 	try:
-
-		figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
-		figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
-		figures.all_paramsets.figuretype_OneParamAndRepetitions_Accuracy.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
-
-		figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='neurongroups.outputs.projMult')
-		figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='connectionsets.con1.stdprule.learningrate')
-		
-		#for requestedMinimumDistance in np.arange(0.01,1.0,0.01):
-		#	figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='connectionsets.con1.maximumweight',requestedMinimumDistance=requestedMinimumDistance)
-		figures.all_paramsets.figuretype_OneParamAndRepetitions_SelectivityOnsetTime.makeFig(params, paramdotpath='connectionsets.con1.maximumweight')
-		
-		# figures.makeFiguretype_TwoParamImage_Accuracy(params,paramStringX='connectionsets.con1.weightdependence.attractorLocation',paramStringY='connectionsets.con1.weightdependence.attractorStrength')
+				
 		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
+		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
 
 		if params.baseParams.recordings.detailedtracking:
 			# old: makeFigs(params.allsimparams,params.metaparams)
@@ -219,10 +211,12 @@ def main():
 	params = dotmap.DotMap()
 
 	#### Define meta settings: executable, etc... ####
-	#existingSimfoldername = None
-	existingSimfoldername = 'sim2016-09-07_trial15'
+	existingSimfoldername = None
+	#existingSimfoldername = 'sim2016-09-07_trial15'
+	#existingSimfoldername = 'sim2016-09-07_trial17'
+	#existingSimfoldername = 'sim2016-09-07_trial20'
 	params.metaparams = define_meta_parameters(existingSimfoldername)
-
+	
 	##### Define simulation settings: ####
 	params.baseParams = define_base_simulation_parameters(params.metaparams)
 	params.extendedParams = define_extended_simulation_parameters(params.metaparams,params.baseParams)
@@ -240,8 +234,9 @@ def main():
 
 	##### Run simulation(s) #####
 	helpers.simulation.run_simulation(params, (existingSimfoldername==None) )
-
-
+	
+	helpers.simulation.rerun_missing_simulations(params)
+	
 	##### Plot results #####
 	make_figures(params)
 
