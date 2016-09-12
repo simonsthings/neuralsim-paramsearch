@@ -12,7 +12,7 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	"""
 
 	extendedParams = dotmap.DotMap()
-	extendedParams.neurongroups.outputs.userecovery = [True,False]
+	#extendedParams.neurongroups.outputs.userecovery = [True,False]
 	#extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
 	#extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 	#extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
@@ -30,7 +30,7 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
 
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
-	extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=21)
+	extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
 
 	return extendedParams
 
@@ -56,12 +56,12 @@ def define_base_simulation_parameters(metaparams):
 	ms = 1e-3 # a millisecond.
 	simparams = dotmap.DotMap()
 	simparams.general.outfileprefix = metaparams.data_basename # dont need this: #+ "_repetition"+str(repetitionID+1)
-	simparams.general.testingProtocol.durations = [400]  #1500  #116  # seconds
-	simparams.general.testingProtocol.intervals = [0.2]  # patterns interval in seconds
+	#simparams.general.testingProtocol.durations = [400]  #1500  #116  # seconds
+	#simparams.general.testingProtocol.intervals = [0.2]  # patterns interval in seconds
 	#simparams.general.testingProtocol.durations = [400,1000] # in seconds
 	#simparams.general.testingProtocol.intervals = [0.2,10] # patterns interval in seconds
-	#simparams.general.testingProtocol.durations = [300,300,900] # in seconds
-	#simparams.general.testingProtocol.intervals = [9999,0.2,10] # patterns interval in seconds
+	simparams.general.testingProtocol.durations = [300,300,1000] # in seconds
+	simparams.general.testingProtocol.intervals = [300,0.2,10] # patterns interval in seconds
 	simparams.general.simtime = sum(simparams.general.testingProtocol.durations)
 	simparams.recordings.detailedtracking = False
 
@@ -118,7 +118,7 @@ def define_base_simulation_parameters(metaparams):
 #	simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
 
 	#simparams.connectionsets.con1.stdprule.weightdependence.type = "AdditiveWeightDependence"
-	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearWeightDependence"
+	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearAttractorWeightDependence"
 	simparams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = 0.0
 	simparams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = 0.5
 
@@ -215,6 +215,7 @@ def main():
 	#existingSimfoldername = 'sim2016-09-07_trial15'
 	#existingSimfoldername = 'sim2016-09-07_trial17'
 	#existingSimfoldername = 'sim2016-09-07_trial20'
+	#existingSimfoldername = 'sim2016-09-08_trial1'
 	params.metaparams = define_meta_parameters(existingSimfoldername)
 	
 	##### Define simulation settings: ####

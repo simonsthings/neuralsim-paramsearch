@@ -179,7 +179,7 @@ def rerun_missing_simulations(params,wetRun=True):
 			resultsfolderPath = line[(resultsfolderpathStart+len(startString)):resultsfolderpathEnd]
 			
 			if not os.path.isfile(resultsfolderPath+params.metaparams.datafig_basename+'.stimulusdetectionstatistics.txt'):
-				print resultsfolderPath + ' has no file ending on ...stimulusdetectionstatistics.txt'
+				print resultsfolderPath + ' has no file called "'+params.metaparams.datafig_basename+'.stimulusdetectionstatistics.txt". '
 				missingparjobfile.write(line)
 				missing_counter += 1
 	
