@@ -110,40 +110,30 @@ def _plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTic
 	fig = plt.gcf()
 	ax = fig.add_axes(location, title='Sensitivity (true positive rate)')
 	plt.imshow(meanTPRs.T, aspect='auto', interpolation='nearest')
-	plt.xticks(np.r_[0:len(xTicks)], xTicks)
-	plt.yticks(np.r_[0:len(yTicks)], yTicks)
+	xTickIDs = np.int32(np.round(np.linspace( 0 , len(xTicks)-1 , 5)))
+	yTickIDs = np.int32(np.round(np.linspace( 0 , len(yTicks)-1 , 5)))
+	plt.xticks(xTickIDs, xTicks[[xTickIDs]])
+	plt.yticks(yTickIDs, yTicks[[yTickIDs]])
 	plt.clim(0,1)
 	theYlims = plt.ylim()
 	plt.ylim([theYlims[1],theYlims[0]])
 	plt.xlabel(readableLabelX)
 	plt.ylabel(readableLabelY)
-	currentXTicks = plt.xticks()
-	if len(xTicks) > 10:
-		idx = np.r_[1:len(xTicks):round(len(xTicks)/10)].astype(int)
-		#print "idx: " + str(idx)
-		for id in idx:
-			currentXTicks[1][id]._text = ''
-	plt.xticks( *currentXTicks)
 
 
 	location = [axesdims.x2, axesdims.y1, axesdims.w2, axesdims.h1]
 	fig = plt.gcf()
 	ax = fig.add_axes(location, title='1-Specificity (false positive rate)')
 	plt.imshow(meanFPRs.T, aspect='auto', interpolation='nearest')
-	plt.xticks(np.r_[0:len(xTicks)], xTicks)
-	plt.yticks(np.r_[0:len(yTicks)], yTicks)
+	xTickIDs = np.int32(np.round(np.linspace( 0 , len(xTicks)-1 , 5)))
+	yTickIDs = np.int32(np.round(np.linspace( 0 , len(yTicks)-1 , 5)))
+	plt.xticks(xTickIDs, xTicks[[xTickIDs]])
+	plt.yticks(yTickIDs, yTicks[[yTickIDs]])
 	plt.clim(0, 1)
 	theYlims = plt.ylim()
 	plt.ylim([theYlims[1], theYlims[0]])
 	plt.xlabel(readableLabelX)
 	plt.ylabel(readableLabelY)
-	currentXTicks = plt.xticks()
-	if len(xTicks) > 10:
-		idx = np.r_[1:len(xTicks):round(len(xTicks)/10)].astype(int)
-		#print "idx: " + str(idx)
-		for id in idx:
-			currentXTicks[1][id]._text = ''
-	plt.xticks( *currentXTicks)
 
 
 	location = [axesdims.x3, axesdims.y1, axesdims.w3, axesdims.h1]
@@ -151,8 +141,10 @@ def _plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTic
 	#ax = fig.add_axes(location, title='"Sensitivity index" ( (tpr-fpr) / sqrt((vartp+varfp)/2) )')
 	ax = fig.add_axes(location, title='tpr - fpr')
 	plt.imshow(cheapAccuracy.T, aspect='auto', interpolation='nearest')
-	plt.xticks(np.r_[0:len(xTicks)], xTicks)
-	plt.yticks(np.r_[0:len(yTicks)], yTicks)
+	xTickIDs = np.int32(np.round(np.linspace( 0 , len(xTicks)-1 , 5)))
+	yTickIDs = np.int32(np.round(np.linspace( 0 , len(yTicks)-1 , 5)))
+	plt.xticks(xTickIDs, xTicks[[xTickIDs]])
+	plt.yticks(yTickIDs, yTicks[[yTickIDs]])
 	plt.clim(0, 1)
 	theYlims = plt.ylim()
 	plt.ylim([theYlims[1], theYlims[0]])
@@ -160,13 +152,6 @@ def _plotStuff(axesdims, true_positive_rates, false_positive_rates, xTicks, yTic
 	plt.ylabel(readableLabelY)
 	#plt.colorbar(label='dlas')
 	plt.colorbar()
-	currentXTicks = plt.xticks()
-	if len(xTicks) > 10:
-		idx = np.r_[1:len(xTicks):round(len(xTicks)/10)].astype(int)
-		#print "idx: " + str(idx)
-		for id in idx:
-			currentXTicks[1][id]._text = ''
-	plt.xticks( *currentXTicks)
 
 
 	pass
