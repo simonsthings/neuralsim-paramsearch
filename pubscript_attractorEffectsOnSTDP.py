@@ -216,6 +216,7 @@ def main():
 	#existingSimfoldername = 'sim2016-09-07_trial17'
 	#existingSimfoldername = 'sim2016-09-07_trial20'
 	#existingSimfoldername = 'sim2016-09-08_trial1'
+	#existingSimfoldername = 'sim2016-09-12_trial1'
 	params.metaparams = define_meta_parameters(existingSimfoldername)
 	
 	##### Define simulation settings: ####

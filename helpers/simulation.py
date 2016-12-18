@@ -13,8 +13,6 @@ def run_simulation(params ,wetRun=True):
 		os.makedirs(metaparams.data_path)
 	os.chdir(metaparams.data_path)
 
-	parjobfile = open('par_jobs.txt', 'w')
-
 
 	theCmdString = ""
 	theRedirectString = ""
@@ -48,78 +46,93 @@ def run_simulation(params ,wetRun=True):
 
 
 
-	for paramsetID in xrange(numParameterSets):
-		simparams = allsimparams[paramsetID]
-		paramsetFoldername = 'psim'
-		shortParamStrings = {}
-		for psimParamString in simparams.extendedparams: # make a dict of just the last part of each param string
-			if '.' in psimParamString:
-				lastDotPosition = psimParamString.rfind('.')
-				shortParamStrings[psimParamString[ lastDotPosition +1:]] = psimParamString
-			else:
-				shortParamStrings[psimParamString] = psimParamString
-		for shortParamString in sorted \
-				(shortParamStrings.keys()): # sort that dict's keys and create folder name of params in alphabetical order.
-			psimParamString = shortParamStrings[shortParamString]
-			paramsetFoldername += '_'+ shortParamString + str(simparams.extendedparams[psimParamString])
-		simparams.extendedparamFoldername = paramsetFoldername
-		if not os.path.exists(paramsetFoldername):
-			os.makedirs(paramsetFoldername)
-		os.chdir(paramsetFoldername)
-
-		for repetitionID in xrange(metaparams.numRepetitions):
-			repfolder = metaparams.repetitionFoldernames[repetitionID]
-			if not os.path.exists(repfolder):
-				os.makedirs(repfolder)
-			
-			simparams.repetitionID = repetitionID
-			simparams.neurongroups.inputs.randomseed = int(random.randint(0, 2 ** 30))  # long(time.time())
-			#simparams.neurongroups.inputs.randomseed = 1043771618
-			paramfile = open(repfolder + '/settings_simulation.json', 'w')
-			json.dump(simparams.toDict(), paramfile, sort_keys=True, indent=4, separators=(',', ': '))
-			paramfile.close()
-
-			# paramfile = open(metaparams.data_path+'settings_recording.json', 'w')
-			# json.dump(oneSimParams.recordings.toDict(), paramfile, sort_keys=True, indent=4, separators=(',', ': '))
-			# paramfile.close()
-
-			# if (repetitionID+1 == metaparams.numRepetitions) and (paramsetID+1 == numParameterSets):
-			#    theRedirectString = ""
-
-			theCmdString += "( cd " + paramsetFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
-
-			simString = " cd " + paramsetFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
-			parjobfile.write(simString)
-
-		os.chdir('..')
-
-	theCmdString += "time wait "
-
-	# os.system('time ../'+sim_executable_path+sim_executable_file+' '+' --seed='+str(simparams.neurongroups.inputs.randomseed)+' --simtime='+str(simparams.general.simtime)+' --Npre='+str(simparams.neurongroups.inputs.N)+' ')
-	# os.system('time ../'+sim_executable_path+sim_executable_file+' '+'  ')
-	# os.system('time ../'+sim_executable_path+sim_executable_file+' --show-settings'+'  ')
-	# os.system('time ../'+sim_executable_path+sim_executable_file+' --show-settings --settingsfile /Users/simon/Workspaces/WorkspaceGIT/MyGitHubAccount/auryn/plot/sim_simon1.data/settings_simulation.json '+'  ')
-	# os.system('time ../'+sim_executable_path+sim_executable_file+' --show-settings --settingsfile '+os.getcwd()+'/settings_simulation.json '+'  ')
-	# os.system('time ../'+sim_executable_path+sim_executable_file+' --settingsfile '+os.getcwd()+'/settings_simulation.json '+'  ')
-	# print "The command string is:"
-	# print theCmdString
-
-	parjobfile.close()
 
 
 	if wetRun:
-		print "Writing data to '"+params.metaparams.datafig_basename+"'..."
+
+		parjobfile = open('par_jobs.txt', 'w')
+		print "Preparing result folder structure and writing to " + parjobfile.name
+		
+		for paramsetID in xrange(numParameterSets):
+			simparams = allsimparams[paramsetID]
+			produceExtendedparamFoldername(simparams)
+			if not os.path.exists(simparams.extendedparamFoldername):
+				os.makedirs(simparams.extendedparamFoldername)
+			os.chdir(simparams.extendedparamFoldername)
+	
+			for repetitionID in xrange(metaparams.numRepetitions):
+				repfolder = metaparams.repetitionFoldernames[repetitionID]
+				if not os.path.exists(repfolder):
+					os.makedirs(repfolder)
+				
+				simparams.repetitionID = repetitionID
+				simparams.neurongroups.inputs.randomseed = int(random.randint(0, 2 ** 30))  # long(time.time())
+				#simparams.neurongroups.inputs.randomseed = 1043771618
+				paramfile = open(repfolder + '/settings_simulation.json', 'w')
+				json.dump(simparams.toDict(), paramfile, sort_keys=True, indent=4, separators=(',', ': '))
+				paramfile.close()
+	
+				# paramfile = open(metaparams.data_path+'settings_recording.json', 'w')
+				# json.dump(oneSimParams.recordings.toDict(), paramfile, sort_keys=True, indent=4, separators=(',', ': '))
+				# paramfile.close()
+	
+				# if (repetitionID+1 == metaparams.numRepetitions) and (paramsetID+1 == numParameterSets):
+				#    theRedirectString = ""
+	
+				theCmdString += "( cd " + simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
+	
+				simString = " cd " + simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
+				parjobfile.write(simString)
+	
+			os.chdir('..')
+	
+		theCmdString += "time wait "
+	
+		# os.system('time ../'+sim_executable_path+sim_executable_file+' '+' --seed='+str(simparams.neurongroups.inputs.randomseed)+' --simtime='+str(simparams.general.simtime)+' --Npre='+str(simparams.neurongroups.inputs.N)+' ')
+		# os.system('time ../'+sim_executable_path+sim_executable_file+' '+'  ')
+		# os.system('time ../'+sim_executable_path+sim_executable_file+' --show-settings'+'  ')
+		# os.system('time ../'+sim_executable_path+sim_executable_file+' --show-settings --settingsfile /Users/simon/Workspaces/WorkspaceGIT/MyGitHubAccount/auryn/plot/sim_simon1.data/settings_simulation.json '+'  ')
+		# os.system('time ../'+sim_executable_path+sim_executable_file+' --show-settings --settingsfile '+os.getcwd()+'/settings_simulation.json '+'  ')
+		# os.system('time ../'+sim_executable_path+sim_executable_file+' --settingsfile '+os.getcwd()+'/settings_simulation.json '+'  ')
+		# print "The command string is:"
+		# print theCmdString
+	
+		parjobfile.close()
+
+
+		print "Now actually running sims. Writing data to '"+params.metaparams.datafig_basename+"'..."
 		gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog.txt :::: par_jobs.txt"
 		os.system(gnuParallelCmdString)
 		# os.system(theCmdString)
 	else:
 		print "Skipping sims! (Using data in '"+params.metaparams.datafig_basename+"' instead!)"  # dry run
+		
+		# Insert extendedparamFoldername and repetitionID into each simparams set, because some figure generation scripts refer to them
+		# (could also read the random seed from json file, but that is unnecessary and would be slow):
+		for paramsetID in xrange(numParameterSets):
+			simparams = allsimparams[paramsetID]
+			produceExtendedparamFoldername(simparams)
+			for repetitionID in xrange(metaparams.numRepetitions):
+				simparams.repetitionID = repetitionID
 
 	os.chdir(initialDir)
 
 	pass
 
 
+def produceExtendedparamFoldername(simparams):
+	paramsetFoldername = 'psim'
+	shortParamStrings = {}
+	for psimParamString in simparams.extendedparams:  # make a dict of just the last part of each param string
+		if '.' in psimParamString:
+			lastDotPosition = psimParamString.rfind('.')
+			shortParamStrings[psimParamString[lastDotPosition + 1:]] = psimParamString
+		else:
+			shortParamStrings[psimParamString] = psimParamString
+	for shortParamString in sorted(shortParamStrings.keys()):  # sort that dict's keys and create folder name of params in alphabetical order.
+		psimParamString = shortParamStrings[shortParamString]
+		paramsetFoldername += '_' + shortParamString + str(simparams.extendedparams[psimParamString])
+	simparams.extendedparamFoldername = paramsetFoldername
 
 
 def find_unique_foldername(basefolder='', repeatLastName=False):
