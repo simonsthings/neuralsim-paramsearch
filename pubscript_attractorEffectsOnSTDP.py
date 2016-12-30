@@ -1,6 +1,11 @@
 import dotmap
 import numpy as np
 
+# switch off the need for an X-windows backend:
+import matplotlib as mpl
+mpl.use('Agg')
+#import matplotlib.pyplot as plt
+
 import figures
 import helpers
 
