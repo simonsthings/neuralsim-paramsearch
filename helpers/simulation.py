@@ -99,6 +99,17 @@ def run_simulation(params ,wetRun=True):
 	
 		parjobfile.close()
 
+		import time
+		print "Starting simulation in 5 seconds..."
+		time.sleep(1)
+		print "4"
+		time.sleep(1)
+		print "3"
+		time.sleep(1)
+		print "2"
+		time.sleep(1)
+		print "1"
+		time.sleep(1)
 
 		print "Now actually running sims. Writing data to '"+params.metaparams.datafig_basename+"'..."
 		gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog.txt :::: par_jobs.txt"

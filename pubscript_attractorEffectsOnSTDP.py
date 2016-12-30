@@ -26,11 +26,16 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 , 0.05 , 0.075 , 0.1 , 0.2 , 0.3 , 0.4 , 0.5]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.r_[0.0:0.52:0.025]
 	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
+	
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=21)
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.r_[-0.2:0.4:0.1] # 7 values
+	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.round(np.r_[-0.2:0.4:0.05],3) # 13 values, rounded to 3 digits behind the dot
+
+	extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=4)
 
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
-	extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
+	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
 
 	return extendedParams
 
@@ -60,7 +65,7 @@ def define_base_simulation_parameters(metaparams):
 	#simparams.general.testingProtocol.intervals = [0.2]  # patterns interval in seconds
 	#simparams.general.testingProtocol.durations = [400,1000] # in seconds
 	#simparams.general.testingProtocol.intervals = [0.2,10] # patterns interval in seconds
-	simparams.general.testingProtocol.durations = [300,300,1000] # in seconds
+	simparams.general.testingProtocol.durations = [300,300,1500] # in seconds
 	simparams.general.testingProtocol.intervals = [300,0.2,10] # patterns interval in seconds
 	simparams.general.simtime = sum(simparams.general.testingProtocol.durations)
 	simparams.recordings.detailedtracking = False
@@ -103,9 +108,10 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.initialweight = 0.85
 	simparams.connectionsets.con1.maximumweight = 1.0
 	#simparams.connectionsets.con1.type = "STDPConnection"
-	simparams.connectionsets.con1.type = "GeneralAlltoallSTDPConnection"
+	#simparams.connectionsets.con1.type = "GeneralAlltoallSTDPConnection"
+	simparams.connectionsets.con1.type = "WDHomeostaticSTDPConnection"
 
-	simparams.connectionsets.con1.stdprule.A_plus = 0.588
+	simparams.connectionsets.con1.stdprule.A_plus = 0.8 # 0.588
 	simparams.connectionsets.con1.stdprule.A_minus = -1
 	simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
 	simparams.connectionsets.con1.stdprule.tau_minus = 28.6 *ms #22e-3
@@ -121,6 +127,7 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearAttractorWeightDependence"
 	simparams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = 0.0
 	simparams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = 0.5
+	simparams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = 0.0
 
 	simparams.connectionsets.con1.homeostasis.type = "ConstantGrowth"
 	simparams.connectionsets.con1.homeostasis.type = "RandomGrowth"
@@ -176,7 +183,7 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams.data_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 1
+	metaparams.numRepetitions = 4
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
@@ -187,6 +194,8 @@ def make_figures(params):
 				
 		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
 		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
+		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.theMeanSlope', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
+		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.theMeanSlope')
 
 		if params.baseParams.recordings.detailedtracking:
 			# old: makeFigs(params.allsimparams,params.metaparams)
