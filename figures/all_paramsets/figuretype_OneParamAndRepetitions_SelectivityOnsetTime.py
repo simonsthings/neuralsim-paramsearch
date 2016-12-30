@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from numpy import arange
 import os
 import helpers
-from SimonsPythonHelpers import nestedPrint
+#from SimonsPythonHelpers import nestedPrint
 
 
 def makeFig(params, paramdotpath, requestedMinimumDistance = 0.75):

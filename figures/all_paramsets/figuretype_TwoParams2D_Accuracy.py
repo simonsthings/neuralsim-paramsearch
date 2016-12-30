@@ -4,7 +4,7 @@ from numpy import arange
 import numpy as np
 import os
 import helpers
-from SimonsPythonHelpers import nestedPrint
+#from SimonsPythonHelpers import nestedPrint
 
 
 def makeFig(params, paramdotpathX, paramdotpathY):

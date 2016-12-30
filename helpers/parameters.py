@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from numpy import int32, arange
 import peakutils
 
-from SimonsPythonHelpers import nestedPrint
+#from SimonsPythonHelpers import nestedPrint
 
 
 def _extendParamSet_old(metaparams, baseParams, extendedParams, allsimparams, originalBaseParams=None,
