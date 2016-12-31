@@ -178,8 +178,10 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams = dotmap.DotMap()
 	#metaparams.executable_path = '../build/debug/examples/'
 	#metaparams.executable_path = '../auryn_v0.8.0/build/release/examples/'
-	metaparams.executable_path = '../auryn_migration_to_v8.0/build/release/examples/'
-	metaparams.executable_file = 'sim_json'
+	#metaparams.executable_path = '../auryn_migration_to_v8.0/build/release/examples/'
+	#metaparams.executable_file = 'sim_json'
+	metaparams.executable_path = '' # use a symlink in the current folder:
+	metaparams.executable_file = 'sim_json_symlink'
 	if existingSimfoldername:
 		metaparams.datafig_basename = existingSimfoldername
 	else:
