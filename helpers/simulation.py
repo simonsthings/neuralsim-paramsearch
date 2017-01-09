@@ -14,7 +14,7 @@ def run_simulation(params ,wetRun=True):
 	os.chdir(metaparams.data_path)
 
 
-	theCmdString = ""
+	#theCmdString = ""
 	theRedirectString = ""
 	numParameterSets = len(allsimparams)
 	if numParameterSets > 1 or metaparams.numRepetitions > 1:
@@ -79,14 +79,14 @@ def run_simulation(params ,wetRun=True):
 				# if (repetitionID+1 == metaparams.numRepetitions) and (paramsetID+1 == numParameterSets):
 				#    theRedirectString = ""
 	
-				theCmdString += "( cd " + metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
+				#theCmdString += "( cd " + metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
 	
-				simString = " cd " + simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
+				simString = " cd " + metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
 				parjobfile.write(simString)
 	
 			os.chdir('..')
 	
-		theCmdString += "time wait "
+		#theCmdString += "time wait "
 	
 		# os.system('time ../'+sim_executable_path+sim_executable_file+' '+' --seed='+str(simparams.neurongroups.inputs.randomseed)+' --simtime='+str(simparams.general.simtime)+' --Npre='+str(simparams.neurongroups.inputs.N)+' ')
 		# os.system('time ../'+sim_executable_path+sim_executable_file+' '+'  ')
