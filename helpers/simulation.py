@@ -98,7 +98,14 @@ def run_simulation(params ,wetRun=True):
 		# print theCmdString
 	
 		parjobfile.close()
-
+		
+		# export everything to its own pickled file, just in case. This will usually never be read again and is just for debugging:
+		print "Saving the whole gobbledigook of batch-params via pickle, just in case..."
+		import pickle
+		batchparamfile = open('settings_batch.pickle', 'w')
+		pickle.dump(params,batchparamfile)
+		batchparamfile.close()
+		
 		import time
 		print "Starting simulation in 5 seconds..."
 		time.sleep(1)
@@ -112,9 +119,7 @@ def run_simulation(params ,wetRun=True):
 		time.sleep(1)
 
 		print "Now actually running sims. Writing data to '"+params.metaparams.datafig_basename+"'..."
-		gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog.txt :::: par_jobs.txt"
-		os.system(gnuParallelCmdString)
-		# os.system(theCmdString)
+		__run_local_or_on_cluster('par_jobs.txt', numSimulations=numParameterSets * metaparams.numRepetitions)
 	else:
 		print "Skipping sims! (Using data in '"+params.metaparams.datafig_basename+"' instead!)"  # dry run
 		
@@ -213,12 +218,44 @@ def rerun_missing_simulations(params,wetRun=True):
 	if wetRun:
 		if missing_counter>0:
 			print "Now re-running "+str(missing_counter)+" sims of '"+params.metaparams.datafig_basename+"' that somehow didn't succeed in the first run..."
-			gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog_missing.txt :::: par_jobs_repeatmissing.txt"
-			os.system(gnuParallelCmdString)
-			# os.system(theCmdString)
+			__run_local_or_on_cluster('par_jobs_repeatmissing.txt', numSimulations=missing_counter)
 
 	os.chdir(initialDir)
 
 	pass
 
+def __get_pubscript_name():
+	import traceback
+	try:
+		raise ValueError
+	except:
+		tb = traceback.extract_stack()
+		for se in tb:
+			if 'pubscript_' in se[0]:
+				pubscriptPos = str(se[0]).rfind('_') + 1
+				pubscriptname = se[0][pubscriptPos:-3]
+				return pubscriptname
+	return 'neuralsim'
 
+def __run_local_or_on_cluster(jobfilename, numSimulations=None):
+	if not numSimulations:
+		i=0
+		with open(jobfilename) as f:
+			for i, l in enumerate(f):
+				pass
+		numSimulations = i + 1
+	
+	if '.nemo.' in os.environ['HOSTNAME']:
+		# running on the bwFor-NEMO cluster!
+		moabJobname = __get_pubscript_name()
+		moabCmdString = 'msub - t '+moabJobname+'[1-'+str(numSimulations) + '] arrayscript1.sh'
+		os.system(moabCmdString)
+		pass
+	elif 'automatix' in os.environ['HOSTNAME']:
+		# running on automatix.nes.uni-freiburg.de
+		pass
+	else:
+		# running locally using gnu-parallel (gnu-parallel must be installed on this machine):
+		gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog_missing.txt :::: " + jobfilename
+		os.system(gnuParallelCmdString)
+		pass
