@@ -81,7 +81,7 @@ def run_simulation(params ,wetRun=True):
 	
 				#theCmdString += "( cd " + metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
 	
-				simString = " cd " + metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
+				simString = " cd " + initialDir+'/'+metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
 				parjobfile.write(simString)
 	
 			os.chdir('..')
@@ -239,16 +239,22 @@ def __get_pubscript_name():
 
 def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 	if not numSimulations:
+		# this code is untested. May over- or undercount by 1.
 		i=0
 		with open(jobfilename) as f:
 			for i, l in enumerate(f):
 				pass
 		numSimulations = i + 1
 	
+	scriptnamepath = os.path.realpath(__file__)
+	scriptpath = scriptnamepath[:scriptnamepath.rfind('/')]
+	#print scriptpath
+	
 	if '.nemo.' in os.environ['HOSTNAME']:
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
-		moabCmdString = 'msub -t '+moabJobname+'[1-'+str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
+		#moabCmdString = 'msub -t ' + moabJobname + '[1-' + str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
+		moabCmdString = 'msub -t '+moabJobname+'[1-'+str(numSimulations) + '] '+scriptpath+'/moab_arrayrun.sh '
 		print moabCmdString
 		os.system(moabCmdString)
 		pass
