@@ -79,7 +79,7 @@ def run_simulation(params ,wetRun=True):
 				# if (repetitionID+1 == metaparams.numRepetitions) and (paramsetID+1 == numParameterSets):
 				#    theRedirectString = ""
 	
-				theCmdString += "( cd " + simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
+				theCmdString += "( cd " + metaparams.data_path+simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+' ) &'
 	
 				simString = " cd " + simparams.extendedparamFoldername + '/' + repfolder + " ; " + initialDir +'/'+ metaparams.executable_path + metaparams.executable_file + ' --settingsfile ' + os.getcwd() + '/' + repfolder + '/settings_simulation.json ' + theRedirectString + '; cd '+initialDir+'  \n'
 				parjobfile.write(simString)
@@ -248,7 +248,8 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 	if '.nemo.' in os.environ['HOSTNAME']:
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
-		moabCmdString = 'msub - t '+moabJobname+'[1-'+str(numSimulations) + '] arrayscript1.sh'
+		moabCmdString = 'msub -t '+moabJobname+'[1-'+str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
+		print moabCmdString
 		os.system(moabCmdString)
 		pass
 	elif 'automatix' in os.environ['HOSTNAME']:
@@ -257,5 +258,6 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 	else:
 		# running locally using gnu-parallel (gnu-parallel must be installed on this machine):
 		gnuParallelCmdString = "time parallel --bar --joblog " + os.getcwd() + "/joblog_missing.txt :::: " + jobfilename
+		print gnuParallelCmdString
 		os.system(gnuParallelCmdString)
 		pass
