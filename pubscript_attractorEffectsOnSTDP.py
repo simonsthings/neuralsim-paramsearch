@@ -215,11 +215,14 @@ def make_figures(params):
 			else:
 				figures.per_repetition.figuretype_DevelopmentOfResponses.makeFigs(params,plotDevelopmentOfWeights=False)
 
+		return True
 
 	except IOError as e:
 		print e.message
 		print e
 		print type(e)
+		
+		return False
 
 
 
@@ -253,10 +256,10 @@ def main():
 	##### Run simulation(s) #####
 	helpers.simulation.run_simulation(params, (existingSimfoldername==None) )
 	
-	helpers.simulation.rerun_missing_simulations(params)
+	#helpers.simulation.rerun_missing_simulations(params)
 	
 	##### Plot results #####
-	make_figures(params)
+	#make_figures(params)
 
 
 if __name__ == "__main__":

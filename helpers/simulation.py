@@ -102,6 +102,7 @@ def run_simulation(params ,wetRun=True):
 		# export everything to its own pickled file, just in case. This will usually never be read again and is just for debugging:
 		print "Saving the whole gobbledigook of batch-params via pickle, just in case..."
 		import pickle
+		params.runparams.pubscriptname = __get_pubscript_name()
 		batchparamfile = open('settings_batch.pickle', 'w')
 		pickle.dump(params,batchparamfile)
 		batchparamfile.close()
@@ -250,7 +251,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 	scriptpath = scriptnamepath[:scriptnamepath.rfind('/')]
 	#print scriptpath
 	
-	if '.nemo.' in os.environ['HOSTNAME']:
+	if '.nemo.' in os.environ['HOSTNAME'] and numSimulations > 30:
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
 		#moabCmdString = 'msub -t ' + moabJobname + '[1-' + str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
@@ -258,7 +259,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 		print moabCmdString
 		os.system(moabCmdString)
 		pass
-	elif 'automatix' in os.environ['HOSTNAME']:
+	elif 'automatix' in os.environ['HOSTNAME'] and numSimulations > 30:
 		# running on automatix.nes.uni-freiburg.de
 		pass
 	else:
