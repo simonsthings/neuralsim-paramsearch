@@ -219,6 +219,19 @@ def rerun_missing_simulations(params,wetRun=True):
 	if wetRun:
 		if missing_counter>0:
 			print "Now re-running "+str(missing_counter)+" sims of '"+params.metaparams.datafig_basename+"' that somehow didn't succeed in the first run..."
+			
+			import time
+			print "Starting simulation in 5 seconds..."
+			time.sleep(1)
+			print "4"
+			time.sleep(1)
+			print "3"
+			time.sleep(1)
+			print "2"
+			time.sleep(1)
+			print "1"
+			time.sleep(1)
+			
 			__run_local_or_on_cluster('par_jobs_repeatmissing.txt', numSimulations=missing_counter)
 
 	os.chdir(initialDir)

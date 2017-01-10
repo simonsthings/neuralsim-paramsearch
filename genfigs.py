@@ -27,18 +27,6 @@ def main():
 	if not successful:
 		print "There was a problem while generating the figures. The most likely reason for this is that not all parallel simulations have finished successfully. Re-starting the missing psims now!"
 		
-		import time
-		print "Starting simulation in 5 seconds..."
-		time.sleep(1)
-		print "4"
-		time.sleep(1)
-		print "3"
-		time.sleep(1)
-		print "2"
-		time.sleep(1)
-		print "1"
-		time.sleep(1)
-
 		import helpers
 		helpers.simulation.rerun_missing_simulations(pickled_params)
 
