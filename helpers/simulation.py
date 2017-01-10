@@ -251,7 +251,7 @@ def __get_pubscript_name():
 				return pubscriptname
 	return 'neuralsim'
 
-def __run_local_or_on_cluster(jobfilename, numSimulations=None):
+def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificationsettings=' -m bea  -M simon.vogt@blbt.uni-freiburg.de '):
 	if not numSimulations:
 		# this code is untested. May over- or undercount by 1.
 		i=0
@@ -268,7 +268,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
 		#moabCmdString = 'msub -t ' + moabJobname + '[1-' + str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
-		moabCmdString = 'msub -t '+moabJobname+'[1-'+str(numSimulations) + '] '+scriptpath+'/moab_arrayrun.sh '
+		moabCmdString = 'msub '+anyemailnotificationsettings+' -t '+moabJobname+'[1-'+str(numSimulations) + '] '+scriptpath+'/moab_arrayrun.sh '
 		print moabCmdString
 		os.system(moabCmdString)
 		pass
