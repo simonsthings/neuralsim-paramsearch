@@ -55,11 +55,11 @@ def main():
 	allS = [0.1]
 	#allS = np.linspace(0,0.5,6)
 	#allL = np.linspace(-0.5,0.9,5)
-	allS = np.linspace(0,0.5,num=4)
-	allL = [0.1]
+	allS = np.linspace(0,0.3,num=4)
+	allL = [0.2]
 	#allL = np.r_[-0.2:0.4:0.1]  # 7 values
 	#allM = [0.0]
-	allM = np.linspace(0,0.5,num=4)
+	allM = np.linspace(0,0.6,num=4)
 	
 	leftoffset = 0.05
 	rightoffset = 0.05

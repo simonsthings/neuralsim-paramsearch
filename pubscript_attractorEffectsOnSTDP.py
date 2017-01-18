@@ -37,7 +37,7 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.r_[-0.2:0.4:0.1] # 7 values
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.round(np.r_[-0.2:0.4:0.05],3) # 13 values, rounded to 3 digits behind the dot
 
-	extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=7)
+	extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=4)
 
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
 	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
@@ -107,15 +107,19 @@ def define_base_simulation_parameters(metaparams):
 	# projMult ; maxW ; learningrate ; input rate ; (STDP shape) ; (use_recovery) ; (dt) ; ...
 	# input rate ; (STDP shape) ; (dt) ; ...
 
-
+	# General connection settings:
 	simparams.connectionsets.con1.presynaptic = "inputs"
 	simparams.connectionsets.con1.postsynaptic = "outputs"
 	simparams.connectionsets.con1.initialweight = 0.85
 	simparams.connectionsets.con1.maximumweight = 1.0
+	
+	# Connection type:
 	#simparams.connectionsets.con1.type = "STDPConnection"
 	#simparams.connectionsets.con1.type = "GeneralAlltoallSTDPConnection"
-	simparams.connectionsets.con1.type = "WDHomeostaticSTDPConnection"
+	#simparams.connectionsets.con1.type = "WDHomeostaticSTDPConnection"
+	simparams.connectionsets.con1.type = "STDPwdGrowthConnection"
 
+	# STDP parameters:
 	simparams.connectionsets.con1.stdprule.A_plus = 0.8 # 0.588
 	simparams.connectionsets.con1.stdprule.A_minus = -1
 	simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
@@ -128,16 +132,19 @@ def define_base_simulation_parameters(metaparams):
 #	simparams.connectionsets.con1.stdprule.tau_minus = 33.7 *ms #22e-3
 #	simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
 
-	#simparams.connectionsets.con1.stdprule.weightdependence.type = "AdditiveWeightDependence"
-	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearAttractorWeightDependence"
+	# Weight dependence:
+	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearAttractorWeightDependence" # options: AdditiveWeightDependence, LinearAttractorWeightDependence, ...
 	simparams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = 0.0
 	simparams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = 0.5
 	simparams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = 0.0
 
-	simparams.connectionsets.con1.homeostasis.type = "ConstantGrowth"
-	simparams.connectionsets.con1.homeostasis.type = "RandomGrowth"
-	simparams.connectionsets.con1.homeostasis.type = "RandomJitter"
-
+	# Growth:
+	simparams.connectionsets.con1.driftcompensation.type = "ConstantGrowth"  # options: None, ConstantGrowth, RandomGrowth, RandomJitter, RandomShrinkage, ConstantShrinkage
+	simparams.connectionsets.con1.driftcompensation.stride = 0.05   # rough step size in fraction-of-weightrange
+	simparams.connectionsets.con1.driftcompensation.scaleByWeight = False  # use or don't use STDP weight dependence for growing weights
+	simparams.connectionsets.con1.driftcompensation.trainednessMethod = "SumOfLargeWeights"  # options: Entropy, Kurtosis, SumOfExponentials, SumOfLargeWeights
+	simparams.connectionsets.con1.driftcompensation.updateinterval_trainedness = 1.0  # seconds
+	simparams.connectionsets.con1.driftcompensation.updateinterval_weights = 0.01  # seconds
 
 	recordingparams = simparams.recordings
 	recordingparams.inputs.samplinginterval_poprate = 0.1 # seconds

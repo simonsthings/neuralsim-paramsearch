@@ -264,7 +264,11 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 	scriptpath = scriptnamepath[:scriptnamepath.rfind('/')]
 	#print scriptpath
 	
-	if '.nemo.' in os.environ['HOSTNAME'] and numSimulations > 30:
+	theHostname = ''
+	if 'HOSTNAME' in os.environ.keys():
+		theHostname = os.environ['HOSTNAME']
+	
+	if '.nemo.' in theHostname and numSimulations > 30:
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
 		#moabCmdString = 'msub -t ' + moabJobname + '[1-' + str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
@@ -272,7 +276,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 		print moabCmdString
 		os.system(moabCmdString)
 		pass
-	elif 'automatix' in os.environ['HOSTNAME'] and numSimulations > 30:
+	elif 'automatix' in theHostname and numSimulations > 30:
 		# running on automatix.nes.uni-freiburg.de
 		pass
 	else:
