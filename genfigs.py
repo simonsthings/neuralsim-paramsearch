@@ -15,6 +15,7 @@ def main():
 		print "The file '"+pickled_params_filename+"' could not be found. Please check this."
 		sys.exit()
 	
+	print "Unpickling pickled parameters from '"+pickled_params_filename+"'..."
 	with open(pickled_params_filename, 'r') as batchparamfile:
 		pickled_params = pickle.load(batchparamfile)
 		

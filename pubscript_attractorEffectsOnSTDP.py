@@ -30,15 +30,19 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 , 0.05 , 0.075 , 0.1 , 0.2 , 0.3 , 0.4 , 0.5]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.r_[0.0:0.52:0.025]
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
 	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
-	
+
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=21)
 	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.r_[-0.2:0.4:0.1] # 7 values
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.round(np.r_[-0.2:0.4:0.05],3) # 13 values, rounded to 3 digits behind the dot
 
-	extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=4)
-
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=4)
+	
+	#extendedParams.connectionsets.con1.driftcompensation.stride = np.linspace(0.01,0.07,num=4)
+	extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.linspace(0.0, 0.0001, num=21 ),10)
+	
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
 	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
 
@@ -143,8 +147,8 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.driftcompensation.stride = 0.05   # rough step size in fraction-of-weightrange
 	simparams.connectionsets.con1.driftcompensation.scaleByWeight = False  # use or don't use STDP weight dependence for growing weights
 	simparams.connectionsets.con1.driftcompensation.trainednessMethod = "SumOfLargeWeights"  # options: Entropy, Kurtosis, SumOfExponentials, SumOfLargeWeights
-	simparams.connectionsets.con1.driftcompensation.updateinterval_trainedness = 1.0  # seconds
-	simparams.connectionsets.con1.driftcompensation.updateinterval_weights = 0.01  # seconds
+	simparams.connectionsets.con1.driftcompensation.updateinterval_trainedness = 0.1  # seconds
+	simparams.connectionsets.con1.driftcompensation.updateinterval_weights = 0.1  # seconds
 
 	recordingparams = simparams.recordings
 	recordingparams.inputs.samplinginterval_poprate = 0.1 # seconds
@@ -197,7 +201,7 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams.data_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 10
+	metaparams.numRepetitions = 2
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
