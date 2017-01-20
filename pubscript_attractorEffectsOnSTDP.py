@@ -41,7 +41,7 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=4)
 	
 	#extendedParams.connectionsets.con1.driftcompensation.stride = np.linspace(0.01,0.07,num=4)
-	extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.linspace(0.0, 0.0001, num=21 ),10)
+	extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.linspace(0.0, 0.00001, num=21 ),10)
 	
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
 	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
