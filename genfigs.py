@@ -4,7 +4,10 @@ import sys,os
 import pickle
 
 def main():
-	relative_trialdir_path = sys.argv[1]
+	try:
+		relative_trialdir_path = sys.argv[1]
+	except IndexError:
+		relative_trialdir_path = "datafig/sim2017-01-20_trial5"
 
 	if not os.path.exists(relative_trialdir_path):
 		print "The given path was not found. Please specify an existing trial folder."

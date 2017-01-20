@@ -51,7 +51,7 @@ def run_simulation(params ,wetRun=True):
 	if wetRun:
 
 		parjobfile = open('par_jobs.txt', 'w')
-		print "Preparing result folder structure and writing to " + parjobfile.name
+		print "Preparing result folder structure and writing to " + metaparams.data_path + parjobfile.name
 		
 		for paramsetID in xrange(numParameterSets):
 			simparams = allsimparams[paramsetID]

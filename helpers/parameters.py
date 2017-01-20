@@ -106,15 +106,9 @@ def crossAllParamsets(baseParams, flattenedExtendedParams, allsimparams = []):
 		onePath = allLongPathStrings[0]
 		oneList = flattenedExtendedParams.pop(onePath)
 		
-		# get minimum precision (if oneList consists of numbers):
-		if isinstance(oneList[0], (str, unicode)):
-			formatString = '{:s}'
-		else:
-			precList = np.abs(np.asarray(oneList))
-			precList = precList[precList != 0]
-			minvalprecision = int(np.floor(np.min(np.log10(precList))))
-			formatString = '{:.'+str(-minvalprecision)+'f}'
-				
+		# so that all numbers in a list produce strings with the same number of charactors!
+		formatString = get_formatting_string(oneList)
+		
 		# recursion! Do the same as below for the remaining params first:
 		partialSimParams = crossAllParamsets(baseParams, flattenedExtendedParams ,[])
 
@@ -133,6 +127,27 @@ def crossAllParamsets(baseParams, flattenedExtendedParams, allsimparams = []):
 
 		# print "Length of allsimparams before returning: " + str(len(allsimparams))
 		return allsimparams
+
+
+def get_formatting_string(oneList):
+	# get minimum precision (if oneList consists of numbers)!
+	# Usage: formatString.format(variable)
+	if isinstance(oneList[0], (str, unicode)):
+		formatString = '{:s}'
+	else:
+		precList = np.abs(np.asarray(oneList))
+		precList = precList[precList != 0]
+		minvalprecision = int(np.floor(np.min(np.log10(precList))))
+		formatString = '{:.' + str(-minvalprecision) + 'f}'
+	return formatString
+
+def asStringList(oneList):
+	formatString = get_formatting_string(oneList)
+	outputList = []
+	
+	for oneParamValue in oneList:
+		outputList.append(formatString.format(oneParamValue))
+	return outputList
 
 
 def splitByParameter(allsimparams,flattenedExtendedParams,paramStringsList):
@@ -161,18 +176,20 @@ def splitByParameter(allsimparams,flattenedExtendedParams,paramStringsList):
 		#print "The param fullpath string: " + oneParamString
 		#print "All values of this param: " + str(flattenedExtendedParams[oneParamString])
 
+		formatString = get_formatting_string(flattenedExtendedParams[oneParamString])
 		for oneParamValue in flattenedExtendedParams[oneParamString]:
 			#print "The Value: "+str(oneParamValue)
 
 			newsimparamsList = []
 			for simparams in allsimparams:
-				if simparams.extendedparams[oneParamString] == oneParamValue:
+				#if simparams.extendedparams[oneParamString] == oneParamValue:
+				if getParamRecursively(oneParamString,simparams) == oneParamValue:
 					newsimparamsList.append(simparams)
 					#allsimparams.remove(simparams)
 
 			subdict = splitByParameter(newsimparamsList,flattenedExtendedParams,remainingParamStringsList)
 			#thisPartialKey = shortParamString+str(oneParamValue)
-			thisPartialKey = oneParamString+'='+str(oneParamValue)
+			thisPartialKey = oneParamString+'='+formatString.format(oneParamValue)
 			#print "type(subdict): " + str(type(subdict))
 			if type(subdict) is list:
 				perValueSimparams[thisPartialKey] = subdict
