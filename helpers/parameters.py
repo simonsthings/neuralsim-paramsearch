@@ -105,7 +105,16 @@ def crossAllParamsets(baseParams, flattenedExtendedParams, allsimparams = []):
 		allLongPathStrings = sorted(flattenedExtendedParams.keys())
 		onePath = allLongPathStrings[0]
 		oneList = flattenedExtendedParams.pop(onePath)
-
+		
+		# get minimum precision (if oneList consists of numbers):
+		if isinstance(oneList[0], (str, unicode)):
+			formatString = '{:s}'
+		else:
+			precList = np.abs(np.asarray(oneList))
+			precList = precList[precList != 0]
+			minvalprecision = int(np.floor(np.min(np.log10(precList))))
+			formatString = '{:.'+str(-minvalprecision)+'f}'
+				
 		# recursion! Do the same as below for the remaining params first:
 		partialSimParams = crossAllParamsets(baseParams, flattenedExtendedParams ,[])
 
@@ -116,7 +125,7 @@ def crossAllParamsets(baseParams, flattenedExtendedParams, allsimparams = []):
 
 				# make a proper(?) copy of simparams struct and append it to allsimparams:
 				newParams = DotMap(simparams.toDict())
-				newParams.extendedparams[onePath] = paramvalue
+				newParams.extendedparams[onePath] = formatString.format(paramvalue)
 				# print "A copy of baseParams was made and "
 				# print " baseParams["+subnodepath+nodestring+"]="+str(originalBaseParams[subnodepath+nodestring])+" is now "
 				# print "  newParams["+subnodepath+nodestring+"]="+str(newParams[subnodepath+nodestring])

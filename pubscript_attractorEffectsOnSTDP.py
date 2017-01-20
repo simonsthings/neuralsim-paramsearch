@@ -124,7 +124,7 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.type = "STDPwdGrowthConnection"
 
 	# STDP parameters:
-	simparams.connectionsets.con1.stdprule.A_plus = 0.8 # 0.588
+	simparams.connectionsets.con1.stdprule.A_plus = 0.588 # 0.8
 	simparams.connectionsets.con1.stdprule.A_minus = -1
 	simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
 	simparams.connectionsets.con1.stdprule.tau_minus = 28.6 *ms #22e-3
@@ -201,7 +201,7 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams.data_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 2
+	metaparams.numRepetitions = 1
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
@@ -212,8 +212,6 @@ def make_figures(params):
 				
 		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
 		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
-		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.theMeanSlope', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
-		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.theMeanSlope')
 
 		if params.baseParams.recordings.detailedtracking:
 			# old: makeFigs(params.allsimparams,params.metaparams)
