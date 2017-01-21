@@ -29,6 +29,7 @@ do
     #echo "The commands to be executed are:"
     #echo $PSIM_CMD
     eval $PSIM_CMD
+    echo $PSIM_NUM >> ${PBS_O_WORKDIR}/psims_finished.txt
   fi
 done
 

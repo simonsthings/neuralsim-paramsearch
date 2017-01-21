@@ -272,10 +272,15 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 	if '.nemo.' in theHostname and numSimulations > 30:
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
-		#moabCmdString = 'msub -t ' + moabJobname + '[1-' + str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
-		moabCmdString = 'msub '+anyemailnotificationsettings+' -v JOBLISTFILE="'+jobfilename+'" -t '+moabJobname+'[1-'+str(numJobs) + '] '+scriptpath+'/moab_arrayrun.sh '
+		moabCmdString = 'msub '+anyemailnotificationsettings+' -v JOBLISTFILE="'+jobfilename+'" -t '+moabJobname+'[1-'+str(numJobs) + '] '+scriptpath+'/moab_arrayrun.sh >> moab_jobid.txt'
 		print moabCmdString
+		# reset the progress counter, to be re-built by moab_arrayrun.sh:
+		try:
+			os.remove("psims_finished.txt")
+		except OSError:
+			pass  # ignore any errors: they probably just mean that the file hadn't been created yet.
 		os.system(moabCmdString)
+		os.system("cat moab_jobid.txt")  # quick way to both display the job id on the terminal as well as writing it to a file (see moabCmdString).
 		pass
 	elif 'automatix' in theHostname and numSimulations > 30:
 		# running on automatix.nes.uni-freiburg.de

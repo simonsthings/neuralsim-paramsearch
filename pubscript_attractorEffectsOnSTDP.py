@@ -203,7 +203,7 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams.data_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 1
+	metaparams.numRepetitions = 10
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
