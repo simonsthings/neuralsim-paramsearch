@@ -1,15 +1,39 @@
 #!/bin/bash
+# This script selects a set of lines out of a given $JOBLISTFILE and executes them in turn.
+# To view the available environment variables, do something like this here: export > /home/fr/fr_fr/fr_sv1021/playground/moab_sim_tests/job_environment1_${PBS_JOBID}_$MOAB_JOBARRAYINDEX.txt
 
-#export > /home/fr/fr_fr/fr_sv1021/playground/moab_sim_tests/job_environment1_${PBS_JOBID}_$MOAB_JOBARRAYINDEX.txt
-#echo "The current directory is: $PWD"
+# $JOBLISTFILE will usually be either "par_jobs.txt" or "par_jobs_repeatmissing.txt" and is passed to msub via the -v option.
+THEJOBLIST="${PBS_O_WORKDIR}/${JOBLISTFILE}"
+WC_OUT=$(wc -l ${THEJOBLIST})
+TOTAL_PSIMS=${WC_OUT% *}
 
-PSIM_NUM=$MOAB_JOBARRAYINDEX
+#total number of jobs: MOAB_JOBARRAYRANGE
+PSIMS_PER_JOB=$((TOTAL_PSIMS/MOAB_JOBARRAYRANGE))
+# get ceiling of previous division:
+if (( (PSIMS_PER_JOB*MOAB_JOBARRAYRANGE) < TOTAL_PSIMS )); then
+  PSIMS_PER_JOB=$((PSIMS_PER_JOB+1)) ;
+fi
+
+#JOB_NUM=$MOAB_JOBARRAYINDEX
 #echo "Now running psim ${PSIM_NUM}!"
 
-PSIM_CMD=$(sed "${PSIM_NUM}q;d" ${PBS_O_WORKDIR}/par_jobs.txt)
-#echo "The commands to be executed are:"
-#echo $PSIM_CMD
-eval $PSIM_CMD
+# run (possibly) more than one psim within this moab-job:
+for ((PSIM_NUM_WITHIN_JOB=1;PSIM_NUM_WITHIN_JOB<=PSIMS_PER_JOB;PSIM_NUM_WITHIN_JOB++))
+do
+  # (JOB_NUM-1) * PSIMS_PER_JOB + PSIM_NUM_WITHIN_JOB
+  PSIM_NUM=$(( (MOAB_JOBARRAYINDEX-1) * PSIMS_PER_JOB + PSIM_NUM_WITHIN_JOB    ))
+
+  # the last job may not have all PSIMS_PER_JOB to run:
+  if ((PSIM_NUM <= TOTAL_PSIMS)); then
+    PSIM_CMD=$(sed "${PSIM_NUM}q;d" ${THEJOBLIST})
+    #echo "The commands to be executed are:"
+    #echo $PSIM_CMD
+    eval $PSIM_CMD
+  fi
+done
+
+
+
 
 
 

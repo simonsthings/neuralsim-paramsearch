@@ -259,6 +259,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 			for i, l in enumerate(f):
 				pass
 		numSimulations = i + 1
+	numJobs = min(numSimulations,6000)
 	
 	scriptnamepath = os.path.realpath(__file__)
 	scriptpath = scriptnamepath[:scriptnamepath.rfind('/')]
@@ -272,7 +273,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
 		#moabCmdString = 'msub -t ' + moabJobname + '[1-' + str(numSimulations) + '] ~/playground/moab_sim_tests/arrayscript2.sh'
-		moabCmdString = 'msub '+anyemailnotificationsettings+' -t '+moabJobname+'[1-'+str(numSimulations) + '] '+scriptpath+'/moab_arrayrun.sh '
+		moabCmdString = 'msub '+anyemailnotificationsettings+' -v JOBLISTFILE="'+jobfilename+'" -t '+moabJobname+'[1-'+str(numJobs) + '] '+scriptpath+'/moab_arrayrun.sh '
 		print moabCmdString
 		os.system(moabCmdString)
 		pass
