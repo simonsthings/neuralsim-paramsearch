@@ -138,12 +138,12 @@ def define_base_simulation_parameters(metaparams):
 	# simparams.connectionsets.con1.stdprule.tau_minus = 33.7 *ms #22e-3
 	# simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
 
-	# Song2000 STDP (except for learning rate):
-	simparams.connectionsets.con1.stdprule.A_plus = 1/1.05 # so that the maximum is 1
-	simparams.connectionsets.con1.stdprule.A_minus = -1
+	# Song2000 STDP (including learning rate):
+	simparams.connectionsets.con1.stdprule.A_plus = 1 # so that the maximum is 1
+	simparams.connectionsets.con1.stdprule.A_minus = -1.05
 	simparams.connectionsets.con1.stdprule.tau_plus = 20 *ms
 	simparams.connectionsets.con1.stdprule.tau_minus = 20 *ms #22e-3
-	simparams.connectionsets.con1.stdprule.learningrate = 0.0325 *1 # eta in Auryn
+	simparams.connectionsets.con1.stdprule.learningrate = 0.005 # eta in Auryn
 
 	# Weight dependence:
 	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearAttractorWeightDependence" # options: AdditiveWeightDependence, LinearAttractorWeightDependence, ...
