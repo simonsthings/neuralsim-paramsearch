@@ -259,7 +259,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 			for i, l in enumerate(f):
 				pass
 		numSimulations = i + 1
-	numJobs = min(numSimulations,6000)
+	numJobs = min(numSimulations,2000)
 	
 	scriptnamepath = os.path.realpath(__file__)
 	scriptpath = scriptnamepath[:scriptnamepath.rfind('/')]
