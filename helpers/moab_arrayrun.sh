@@ -28,6 +28,7 @@ do
     PSIM_CMD=$(sed "${PSIM_NUM}q;d" ${THEJOBLIST})
     #echo "The commands to be executed are:"
     #echo $PSIM_CMD
+    echo $PSIM_NUM >> ${PBS_O_WORKDIR}/psims_started.txt
     eval $PSIM_CMD
     echo $PSIM_NUM >> ${PBS_O_WORKDIR}/psims_finished.txt
   fi

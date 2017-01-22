@@ -276,6 +276,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 		print moabCmdString
 		# reset the progress counter, to be re-built by moab_arrayrun.sh:
 		try:
+			os.remove("psims_started.txt")
 			os.remove("psims_finished.txt")
 		except OSError:
 			pass  # ignore any errors: they probably just mean that the file hadn't been created yet.
