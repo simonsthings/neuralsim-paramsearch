@@ -104,7 +104,7 @@ def run_simulation(params ,wetRun=True):
 		import pickle
 		params.runparams.pubscriptname = __get_pubscript_name()
 		batchparamfile = open('settings_batch.pickle', 'w')
-		pickle.dump(params,batchparamfile)
+		pickle.dump(params,batchparamfile,protocol=3)  # protocol 3 should be a compressed, binary format.
 		batchparamfile.close()
 		
 		import time

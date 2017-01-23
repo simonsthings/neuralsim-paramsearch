@@ -139,11 +139,18 @@ def define_base_simulation_parameters(metaparams):
 	# simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
 
 	# Song2000 STDP (including learning rate):
-	simparams.connectionsets.con1.stdprule.A_plus = 1 # so that the maximum is 1
-	simparams.connectionsets.con1.stdprule.A_minus = -1.05
-	simparams.connectionsets.con1.stdprule.tau_plus = 20 *ms
-	simparams.connectionsets.con1.stdprule.tau_minus = 20 *ms #22e-3
-	simparams.connectionsets.con1.stdprule.learningrate = 0.005 # eta in Auryn
+	#simparams.connectionsets.con1.stdprule.A_plus = 1 # so that the maximum is 1
+	#simparams.connectionsets.con1.stdprule.A_minus = -1.05
+	#simparams.connectionsets.con1.stdprule.tau_plus = 20 *ms
+	#simparams.connectionsets.con1.stdprule.tau_minus = 20 *ms #22e-3
+	#simparams.connectionsets.con1.stdprule.learningrate = 0.005 # eta in Auryn
+
+	# FroemkeDan2002 STDP (unknown learning rate):
+	simparams.connectionsets.con1.stdprule.A_plus = 1.01 #  =101%
+	simparams.connectionsets.con1.stdprule.A_minus = -0.52 # = 52%
+	simparams.connectionsets.con1.stdprule.tau_plus = 14.8 *ms
+	simparams.connectionsets.con1.stdprule.tau_minus = 33.8 *ms #22e-3
+	simparams.connectionsets.con1.stdprule.learningrate = 0.0325 # eta in Auryn
 
 	# Weight dependence:
 	simparams.connectionsets.con1.stdprule.weightdependence.type = "LinearAttractorWeightDependence" # options: AdditiveWeightDependence, LinearAttractorWeightDependence, ...
