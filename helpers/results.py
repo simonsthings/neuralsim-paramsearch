@@ -1,7 +1,7 @@
 import numpy as np
 import helpers
 #from SimonsPythonHelpers import nestedPrint
-
+import os, pickle
 
 #def read_1D_Accuracy(metaparams, somesimparams, paramdotpath):
 #	(theTicks, true_positive_rates, false_positive_rates, sufficientSelectivitySpecificityOnsets) = read_1D_result_data(metaparams, somesimparams, paramdotpath, None)
@@ -58,7 +58,7 @@ def read_1D_result_data(metaparams, somesimparams, paramdotpath, requestedMinimu
 
 
 
-def read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY):
+def __read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY):
 
 	xTicks = np.array(params.flatParamLists[paramdotpathX])
 	yTicks = np.array(params.flatParamLists[paramdotpathY])
@@ -88,3 +88,41 @@ def read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY):
 
 	return true_positive_rates, false_positive_rates, xTicks, yTicks
 
+
+def fetch_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY, paramGroupString, useCache=True):
+	shortParamStringX = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathX)
+	shortParamStringY = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathY)
+	
+	# if-clause because we cannot be sure that all known results everywhere have metaparams.cache_path defined.
+	if 'cache_path' in params.metaparams.keys():
+		cachePath = params.metaparams.cache_path
+		cacheName = 'cacheFinalAccuracy2D' + '_' + params.metaparams.cache_basename + '_' + shortParamStringX + 'VS' + shortParamStringY + '__' + paramGroupString + '.pickle'
+	else:
+		cachePath = params.metaparams.figures_path[:-8] + 'cache/'
+		cacheName = 'cacheFinalAccuracy2D' + '_' + params.metaparams.datafig_basename + '_' + shortParamStringX + 'VS' + shortParamStringY + '__' + paramGroupString + '.pickle'
+
+	if not os.path.exists(cachePath):
+		os.makedirs(cachePath)
+
+	if useCache and os.path.isfile(cachePath + cacheName):
+		print "Using cache file '"+cachePath + cacheName+"' instead of re-reading data."
+		
+		# todo unpickle cached data and return.
+		with open(cachePath + cacheName, 'r') as cacheFile:
+			results_from_cache = pickle.load(cacheFile)
+		return results_from_cache
+	
+	else:
+		if useCache:
+			cacheString = "No cache found."
+		else:
+			cacheString = "No cache reading allowed."
+		print cacheString + " Reading data folder and writing to new cache file '" + cachePath + cacheName + "'."
+		
+		# actually read results from data folder structure (or perhaps some remote, huge, distributed database in the future?)
+		new_results = helpers.results.__read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY)
+
+		with open(cachePath + cacheName, 'w') as cacheFile:
+			pickle.dump(new_results,cacheFile,protocol=2)  # protocol 2 should be a compressed, binary format.
+		return new_results
+		

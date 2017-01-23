@@ -63,7 +63,7 @@ def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, param
 	figPath = metaparams.figures_path + 'figtype_' + figBlob + '/'
 	os.system('mkdir -p ' + figPath)
 
-	true_positive_rates, false_positive_rates, xTicks, yTicks = helpers.results.read_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY)
+	true_positive_rates, false_positive_rates, xTicks, yTicks = helpers.results.fetch_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY,paramGroupString)
 
 	fs = (20 ,6)
 	axesdims = dotmap.DotMap()

@@ -104,7 +104,7 @@ def run_simulation(params ,wetRun=True):
 		import pickle
 		params.runparams.pubscriptname = __get_pubscript_name()
 		batchparamfile = open('settings_batch.pickle', 'w')
-		pickle.dump(params,batchparamfile,protocol=3)  # protocol 3 should be a compressed, binary format.
+		pickle.dump(params,batchparamfile,protocol=2)  # protocol 2 should be a compressed, binary format.
 		batchparamfile.close()
 		
 		import time
@@ -259,7 +259,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 			for i, l in enumerate(f):
 				pass
 		numSimulations = i + 1
-	numJobs = min(numSimulations,2000)
+	numJobs = min(numSimulations,3000)
 	
 	scriptnamepath = os.path.realpath(__file__)
 	scriptpath = scriptnamepath[:scriptnamepath.rfind('/')]
