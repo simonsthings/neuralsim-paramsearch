@@ -13,11 +13,20 @@ def main():
 		print "The given path was not found. Please specify an existing trial folder."
 		sys.exit()
 
-	pickled_params_filename = relative_trialdir_path + '/data/settings_batch.pickle'
+	pickled_params_filename =             relative_trialdir_path + '/data/settings_batch.pickle'
+	alternative_pickled_params_filename = relative_trialdir_path +      '/settings_batch.pickle'
 	if not os.path.exists(pickled_params_filename):
-		print "The file '"+pickled_params_filename+"' could not be found. Please check this."
-		sys.exit()
-	
+		print "The file '"+pickled_params_filename+"' could not be found. Trying alternative folder."
+		pickled_params_filename = alternative_pickled_params_filename
+		if not os.path.exists(pickled_params_filename):
+			print "The file '"+pickled_params_filename+"' could not be found. Please check this."
+			sys.exit()
+	else: # so if the pickle-file was found in its original location
+		if not os.path.exists(pickled_params_filename):
+			print "Pickle file found. Copying backup of pickle-file from '"+relative_trialdir_path+"/data' to '"+relative_trialdir_path+"'. "
+			import shutil
+			shutil.copyfile(pickled_params_filename, alternative_pickled_params_filename)
+		
 	print "Unpickling pickled parameters from '"+pickled_params_filename+"'..."
 	with open(pickled_params_filename, 'r') as batchparamfile:
 		pickled_params = pickle.load(batchparamfile)
