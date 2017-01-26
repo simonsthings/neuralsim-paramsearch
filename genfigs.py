@@ -16,7 +16,7 @@ def main():
 	pickled_params_filename =             relative_trialdir_path + '/data/settings_batch.pickle'
 	alternative_pickled_params_filename = relative_trialdir_path +      '/settings_batch.pickle'
 	if not os.path.exists(pickled_params_filename):
-		print "The file '"+pickled_params_filename+"' could not be found. Trying alternative folder."
+		print "The file '"+pickled_params_filename+"' could not be found. Using alternative folder."
 		pickled_params_filename = alternative_pickled_params_filename
 		if not os.path.exists(pickled_params_filename):
 			print "The file '"+pickled_params_filename+"' could not be found. Please check this."
