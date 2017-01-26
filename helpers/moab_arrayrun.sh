@@ -1,6 +1,12 @@
 #!/bin/bash
 # This script selects a set of lines out of a given $JOBLISTFILE and executes them in turn.
 # To view the available environment variables, do something like this here: export > /home/fr/fr_fr/fr_sv1021/playground/moab_sim_tests/job_environment1_${PBS_JOBID}_$MOAB_JOBARRAYINDEX.txt
+#
+# Moab special parameters (these are actually used, despite the comment natur of the lines below!)
+#MSUB -l nodes=1:ppn=1
+#MSUB -l walltime=3:00:00
+#MSUB -m bea
+#MSUB -M simon.vogt@blbt.uni-freiburg.de
 
 # $JOBLISTFILE will usually be either "par_jobs.txt" or "par_jobs_repeatmissing.txt" and is passed to msub via the -v option.
 THEJOBLIST="${PBS_O_WORKDIR}/${JOBLISTFILE}"

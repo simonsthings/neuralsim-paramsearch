@@ -45,7 +45,8 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 
 	#extendedParams.connectionsets.con1.driftcompensation.stride = np.linspace(0.01,0.07,num=4)
 	#extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.logspace(np.log10(0.0000001), np.log10(0.0001), num=21 ),10)
-	
+	#extendedParams.connectionsets.con1.driftcompensation.stride = np.array([ 0.0 , 0.0001 ])
+
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
 	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
 
@@ -161,8 +162,8 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = 0.0
 
 	# Growth:
-	simparams.connectionsets.con1.driftcompensation.type = "ConstantGrowth"  # options: None, ConstantGrowth, RandomGrowth, RandomJitter, RandomShrinkage, ConstantShrinkage
-	simparams.connectionsets.con1.driftcompensation.stride = 0.05   # rough step size in fraction-of-weightrange
+	simparams.connectionsets.con1.driftcompensation.type = "None"  # options: None, ConstantGrowth, RandomGrowth, RandomJitter, RandomShrinkage, ConstantShrinkage
+	simparams.connectionsets.con1.driftcompensation.stride = 0.0001   # rough step size in fraction-of-weightrange; take care to keep this fitting to updateinterval_weights !
 	simparams.connectionsets.con1.driftcompensation.scaleByWeight = False  # use or don't use STDP weight dependence for growing weights
 	simparams.connectionsets.con1.driftcompensation.trainednessMethod = "SumOfLargeWeights"  # options: Entropy, Kurtosis, SumOfExponentials, SumOfLargeWeights
 	simparams.connectionsets.con1.driftcompensation.updateinterval_trainedness = 0.1  # seconds

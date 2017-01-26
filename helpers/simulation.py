@@ -251,7 +251,7 @@ def __get_pubscript_name():
 				return pubscriptname
 	return 'neuralsim'
 
-def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificationsettings=' -m bea  -M simon.vogt@blbt.uni-freiburg.de '):
+def __run_local_or_on_cluster(jobfilename, numSimulations=None):
 	if not numSimulations:
 		# this code is untested. May over- or undercount by 1.
 		i=0
@@ -272,7 +272,7 @@ def __run_local_or_on_cluster(jobfilename, numSimulations=None,anyemailnotificat
 	if '.nemo.' in theHostname and numSimulations > 30:
 		# running on the bwFor-NEMO cluster!
 		moabJobname = __get_pubscript_name()
-		moabCmdString = 'msub '+anyemailnotificationsettings+' -v JOBLISTFILE="'+jobfilename+'" -t '+moabJobname+'[1-'+str(numJobs) + '] '+scriptpath+'/moab_arrayrun.sh >> moab_jobid.txt'
+		moabCmdString = 'msub -v JOBLISTFILE="'+jobfilename+'" -t '+moabJobname+'[1-'+str(numJobs) + '] '+scriptpath+'/moab_arrayrun.sh >> moab_jobid.txt'
 		print moabCmdString
 		# reset the progress counter, to be re-built by moab_arrayrun.sh:
 		try:
