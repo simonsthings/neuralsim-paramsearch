@@ -162,7 +162,7 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = 0.0
 
 	# Growth:
-	simparams.connectionsets.con1.driftcompensation.type = "None"  # options: None, ConstantGrowth, RandomGrowth, RandomJitter, RandomShrinkage, ConstantShrinkage
+	simparams.connectionsets.con1.driftcompensation.type = "ConstantGrowth"  # options: None, ConstantGrowth, RandomGrowth, RandomJitter, RandomShrinkage, ConstantShrinkage
 	simparams.connectionsets.con1.driftcompensation.stride = 0.0001   # rough step size in fraction-of-weightrange; take care to keep this fitting to updateinterval_weights !
 	simparams.connectionsets.con1.driftcompensation.scaleByWeight = False  # use or don't use STDP weight dependence for growing weights
 	simparams.connectionsets.con1.driftcompensation.trainednessMethod = "SumOfLargeWeights"  # options: Entropy, Kurtosis, SumOfExponentials, SumOfLargeWeights
