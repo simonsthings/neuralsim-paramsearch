@@ -61,11 +61,11 @@ def main():
 		print "Finished generating all figures. Now cleaning up some temporary files in '"+ relative_trialdir_path +"/data' ..."
 		os.chdir(relative_trialdir_path+'/data')
 		
-		tarCmd = "tar czf moab_terminaloutputs.tar.gz attractorEffectsOnSTDP.*"
+		tarCmd = "tar czf moab_terminaloutputs.tar.gz "+pickled_params.runparams.pubscriptname+".*"
 		print tarCmd
 		os.system(tarCmd)
 		
-		rmCmd = "rm attractorEffectsOnSTDP.o* attractorEffectsOnSTDP.e*"
+		rmCmd = "rm "+pickled_params.runparams.pubscriptname+".o* "+pickled_params.runparams.pubscriptname+".e*"
 		print rmCmd
 		os.system(rmCmd)
 
