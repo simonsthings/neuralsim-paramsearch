@@ -17,38 +17,23 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	"""
 
 	extendedParams = dotmap.DotMap()
-	#extendedParams.neurongroups.outputs.userecovery = [True,False]
 	#extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
+	#extendedParams.neurongroups.outputs.userecovery = [True,False]
 	#extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 	#extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
-	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.r_[0.2:4.2:0.2]
-	#extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
-	#extendedParams.connectionsets.con1.maximumweight = np.array([0.5 , 0.75 , 1.0 , 1.25 ,  1.5 , 1.75 , 2.0]) # eta in Auryn
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
-	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:8.2:0.2]
 	
- 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 ]
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 , 0.05 , 0.075 , 0.1 , 0.2 , 0.3 , 0.4 , 0.5]
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.r_[0.0:0.52:0.025]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
-
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = [-0.2 , 0.2]
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=21)
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.r_[-0.2:0.4:0.1] # 7 values
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.round(np.r_[-0.2:0.4:0.05],3) # 13 values, rounded to 3 digits behind the dot
-
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,0.6,num=4)
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,1.0,num=21)
 
 	#extendedParams.connectionsets.con1.driftcompensation.stride = np.linspace(0.01,0.07,num=4)
-	#extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.logspace(np.log10(0.0000001), np.log10(0.0001), num=21 ),10)
-	extendedParams.connectionsets.con1.driftcompensation.stride = np.array([ 0.0 , 0.0001 ])
+	extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.logspace(np.log10(0.0000001), np.log10(0.0001), num=21 ),10)
+	#extendedParams.connectionsets.con1.driftcompensation.stride = np.array([ 0.0 , 0.0001 ])
 
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
-	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
+	extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=21)
 
 	return extendedParams
 
@@ -128,18 +113,18 @@ def define_base_simulation_parameters(metaparams):
 	simparams.connectionsets.con1.type = "STDPwdGrowthConnection"
 
 	# Linearised STDP parameters:
-	# simparams.connectionsets.con1.stdprule.A_plus = 0.588 # 0.8
-	# simparams.connectionsets.con1.stdprule.A_minus = -1
-	# simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
-	# simparams.connectionsets.con1.stdprule.tau_minus = 28.6 *ms #22e-3
-	# simparams.connectionsets.con1.stdprule.learningrate = 0.0325 *1 # eta in Auryn
+	simparams.connectionsets.con1.stdprule.A_plus = 0.588 # 0.8
+	simparams.connectionsets.con1.stdprule.A_minus = -1
+	simparams.connectionsets.con1.stdprule.tau_plus = 28.6 *ms
+	simparams.connectionsets.con1.stdprule.tau_minus = 28.6 *ms #22e-3
+	simparams.connectionsets.con1.stdprule.learningrate = 0.0325 *1 # eta in Auryn
 	
 	# Masquelier STDP parameters:
-	simparams.connectionsets.con1.stdprule.A_plus = 1
-	simparams.connectionsets.con1.stdprule.A_minus = -0.85
-	simparams.connectionsets.con1.stdprule.tau_plus = 16.8 *ms
-	simparams.connectionsets.con1.stdprule.tau_minus = 33.7 *ms #22e-3
-	simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
+	# simparams.connectionsets.con1.stdprule.A_plus = 1
+	# simparams.connectionsets.con1.stdprule.A_minus = -0.85
+	# simparams.connectionsets.con1.stdprule.tau_plus = 16.8 *ms
+	# simparams.connectionsets.con1.stdprule.tau_minus = 33.7 *ms #22e-3
+	# simparams.connectionsets.con1.stdprule.learningrate = 1/32.0/1.0 # eta in Auryn
 
 	# Song2000 STDP (including learning rate):
 	#simparams.connectionsets.con1.stdprule.A_plus = 1 # so that the maximum is 1
@@ -230,9 +215,11 @@ def define_meta_parameters(existingSimfoldername=None):
 
 def make_figures(params):
 	try:
-				
-		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
-		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
+		
+		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
+		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
+		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.driftcompensation.stride', paramdotpathY='connectionsets.con1.stdprule.A_plus')
+		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.A_plus', paramdotpathY='connectionsets.con1.driftcompensation.stride')
 
 		if params.baseParams.recordings.detailedtracking:
 			# old: makeFigs(params.allsimparams,params.metaparams)

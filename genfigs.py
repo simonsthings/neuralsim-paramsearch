@@ -33,9 +33,22 @@ def main():
 		
 	print pickled_params.keys()
 	
-	print "Generating figures via pubscript_attractorEffectsOnSTDP.make_figures(..)" # TODO: implement automatic discovery of which script was used to start the simulations. But logically also then git revision?
-	import pubscript_attractorEffectsOnSTDP
-	successful = pubscript_attractorEffectsOnSTDP.make_figures(pickled_params)
+	if pickled_params.runparams.pubscriptname == 'attractorEffectsOnSTDP':
+		print "Generating figures via pubscript_attractorEffectsOnSTDP.make_figures(..)" # TODO: implement automatic discovery of which script was used to start the simulations. But logically also then git revision?
+		import pubscript_attractorEffectsOnSTDP
+		successful = pubscript_attractorEffectsOnSTDP.make_figures(pickled_params)
+	elif pickled_params.runparams.pubscriptname == 'negDriftVersusGrowth':
+		print "Generating figures via pubscript_negDriftVersusGrowth.make_figures(..)"  # TODO: implement automatic discovery of which script was used to start the simulations. But logically also then git revision?
+		import pubscript_negDriftVersusGrowth
+		successful = pubscript_negDriftVersusGrowth.make_figures(pickled_params)
+	elif pickled_params.runparams.pubscriptname == 'projMultOrLearningrateWithMaxweight':
+		print "Generating figures via pubscript_projMultOrLearningrateWithMaxweight.make_figures(..)"  # TODO: implement automatic discovery of which script was used to start the simulations. But logically also then git revision?
+		import pubscript_projMultOrLearningrateWithMaxweight
+		successful = pubscript_projMultOrLearningrateWithMaxweight.make_figures(pickled_params)
+	else:  # pickled_params.runparams.pubscriptname == 'attractorEffectsOnSTDP':
+		print "Defaulting to generating figures via pubscript_attractorEffectsOnSTDP.make_figures(..)" # TODO: implement automatic discovery of which script was used to start the simulations. But logically also then git revision?
+		import pubscript_attractorEffectsOnSTDP
+		successful = pubscript_attractorEffectsOnSTDP.make_figures(pickled_params)
 
 	if not successful:
 		print "There was a problem while generating the figures. The most likely reason for this is that not all parallel simulations have finished successfully. Re-starting the missing psims now!"
