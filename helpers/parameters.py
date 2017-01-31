@@ -128,8 +128,107 @@ def crossAllParamsets(baseParams, flattenedExtendedParams, allsimparams = []):
 		# print "Length of allsimparams before returning: " + str(len(allsimparams))
 		return allsimparams
 
-
 def get_formatting_string(oneList):
+	# get minimum precision (if oneList consists of numbers)!
+	# Usage: formatString.format(variable)
+	if isinstance(oneList[0], (str, unicode, bool)):
+		formatString = '{:}'
+	else:
+		import decimal
+		
+		precList = np.abs(np.asarray(oneList))
+		precList = precList[precList != 0]
+		beforeDot = int(np.log10(np.max(precList)))+1
+		
+		afterDot = 0
+
+		for val in oneList:
+			d = decimal.Decimal(str(val))
+			afterDot = np.min([ d.as_tuple().exponent , afterDot])
+
+		formatString = '{:' + str(beforeDot) + '.' + str(-afterDot) + 'f}'
+	return formatString
+
+def get_formatting_string_goes_too_far_down(oneList):
+	# get minimum precision (if oneList consists of numbers)!
+	# Usage: formatString.format(variable)
+	if isinstance(oneList[0], (str, unicode, bool)):
+		formatString = '{:s}'
+	else:
+		precList = np.abs(np.asarray(oneList))
+		precList = precList[precList != 0]
+		maxMagnitude = 0
+		minScale = 0
+		for precVal in precList:
+			valMagnitude, valScale = _magnitude_and_scale(precVal)
+			print valMagnitude, valScale
+			maxMagnitude = np.max([maxMagnitude,valMagnitude])
+			minScale = np.max([minScale,valScale]) # np.MAX() because scale is given as positive number by _magnitude_and_scale() function.
+
+		precList = np.abs(np.asarray(oneList))
+		precList = precList[precList != 0]
+		minvalprecision = int(np.floor(np.min(np.log10(precList))))
+		maxvalprecision = int(np.ceil(np.max(np.log10(precList))))
+		minFormat = ''
+		maxFormat = ''
+		if minvalprecision < 0:
+			minFormat = str(-minvalprecision)
+		if maxvalprecision > 0:
+			maxFormat = str(maxvalprecision)
+		formatString = '{:'+maxFormat+'.' + minFormat + 'f}'
+	return formatString
+
+def _magnitude_and_scale(x):
+	max_digits = 14
+	int_part = int(abs(x))
+	magnitude = 1 if int_part == 0 else int(np.log10(int_part)) + 1
+	if magnitude >= max_digits:
+		return (magnitude, 0)
+	frac_part = abs(x) - int_part
+	multiplier = 10 ** (max_digits - magnitude)
+	frac_digits = multiplier + int(multiplier * frac_part + 0.5)
+	while frac_digits % 10 == 0:
+		frac_digits /= 10
+	scale = int(np.log10(frac_digits))
+	return (magnitude, scale)
+
+
+
+def get_formatting_string_stillwrong(oneList):
+	# get minimum precision (if oneList consists of numbers)!
+	# Usage: formatString.format(variable)
+	if isinstance(oneList[0], (str, unicode, bool)):
+		formatString = '{:s}'
+	else:
+		
+		precList = np.abs(np.asarray(oneList))
+		precList = precList[precList != 0]
+
+		beforeDot = int(np.log10(np.max(precList)))+1
+		afterDot = 0
+		
+		smallerOneFloatList = set(precList[precList < 1])
+		
+		# get necessary precision by finding how many digits are needed to make resulting number strings unique:
+		tempListIsUnique = False
+		while not tempListIsUnique:
+			formatString = '{:'+str(beforeDot)+'.' + str(afterDot) + 'f}'
+			tempList = []
+			tempListIsUnique = True
+			for val in oneList:
+				strVal = formatString.format(val)
+				if strVal not in tempList:
+					tempList.append(strVal)
+				else:
+					tempListIsUnique = False
+					afterDot += 1
+					break
+	
+		formatString = '{:' + str(beforeDot) + '.' + str(afterDot) + 'f}'
+	return formatString
+
+
+def get_formatting_string_old(oneList):
 	# get minimum precision (if oneList consists of numbers)!
 	# Usage: formatString.format(variable)
 	if isinstance(oneList[0], (str, unicode)):
@@ -140,6 +239,7 @@ def get_formatting_string(oneList):
 		minvalprecision = int(np.floor(np.min(np.log10(precList))))
 		formatString = '{:.' + str(-minvalprecision) + 'f}'
 	return formatString
+
 
 def asStringList(oneList):
 	formatString = get_formatting_string(oneList)
