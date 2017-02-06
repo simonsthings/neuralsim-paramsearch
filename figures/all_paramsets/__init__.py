@@ -4,4 +4,4 @@ This package bundles all figure types that produce a summary over the whole simu
 import figuretype_OneParamAndRepetitions_Accuracy
 import figuretype_OneParamAndRepetitions_SelectivityOnsetTime
 import figuretype_TwoParams2D_Accuracy
-
+import figuretype_TwoParams2D_GrowthImprovements

@@ -49,7 +49,7 @@ def makeFig(params, paramdotpathX, paramdotpathY):
 			_doThePlotting(params, paramSubgroup, paramGroupString, paramdotpathX, paramdotpathY, figtypename)
 
 	else:  # all parameter sets can be represented in a single figure:
-		_doThePlotting(params, params.allsimparams, "theOnlyFigure", paramdotpathX, paramdotpathY, figtypename)
+		_doThePlotting(params, params.allsimparams, "", paramdotpathX, paramdotpathY, figtypename)
 
 
 def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, paramdotpathY, figtypename):
@@ -91,7 +91,10 @@ def _doThePlotting(params, somesimparams, paramGroupString, paramdotpathX, param
 	
 	figAccuracies.text(0.05,0.97,paramGroupString)
 	
-	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
+	if paramGroupString:
+		figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
+	else:
+		figName = metaparams.figures_basename + '_' + figBlob + '__theOnlyFigure'
 	figAccuracies.savefig(figPath + figName + '.png')
 	plt.close(figAccuracies)
 

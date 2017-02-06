@@ -1,6 +1,7 @@
-#!/bin/python
+#!/usr/local/bin/python
 
 import sys,os
+#import cPickle as pickle
 import pickle
 
 def main():
@@ -29,9 +30,19 @@ def main():
 		
 	print "Unpickling pickled parameters from '"+pickled_params_filename+"'..."
 	with open(pickled_params_filename, 'r') as batchparamfile:
+		import gc
+		gc.disable()
 		pickled_params = pickle.load(batchparamfile)
+		gc.enable()
 		
 	print pickled_params.keys()
+	
+	# adjust possibly changed folders:
+	pickled_params.metaparams.data_path = relative_trialdir_path+'/data/'
+	pickled_params.metaparams.cache_path = relative_trialdir_path+'/cache/'
+	pickled_params.metaparams.figures_path = relative_trialdir_path+'/figures/'
+	pickled_params.metaparams.cache_basename = pickled_params.metaparams.datafig_basename
+	
 	
 	if pickled_params.runparams.pubscriptname == 'attractorEffectsOnSTDP':
 		print "Generating figures via pubscript_attractorEffectsOnSTDP.make_figures(..)" # TODO: implement automatic discovery of which script was used to start the simulations. But logically also then git revision?
@@ -58,16 +69,17 @@ def main():
 
 	else:
 		# everything finished successfully. Do some cleaning!
-		print "Finished generating all figures. Now cleaning up some temporary files in '"+ relative_trialdir_path +"/data' ..."
-		os.chdir(relative_trialdir_path+'/data')
-		
-		tarCmd = "tar czf moab_terminaloutputs.tar.gz "+pickled_params.runparams.pubscriptname+".*"
-		print tarCmd
-		os.system(tarCmd)
-		
-		rmCmd = "rm "+pickled_params.runparams.pubscriptname+".o* "+pickled_params.runparams.pubscriptname+".e*"
-		print rmCmd
-		os.system(rmCmd)
+		print "Finished generating all figures."
+		#print "Finished generating all figures. Now cleaning up some temporary files in '"+ relative_trialdir_path +"/data' ..."
+		#os.chdir(relative_trialdir_path+'/data')
+		#
+		#tarCmd = "tar czf moab_terminaloutputs.tar.gz "+pickled_params.runparams.pubscriptname+".*"
+		#print tarCmd
+		#os.system(tarCmd)
+		#
+		#rmCmd = "rm "+pickled_params.runparams.pubscriptname+".o* "+pickled_params.runparams.pubscriptname+".e*"
+		#print rmCmd
+		#os.system(rmCmd)
 
 if __name__ == "__main__":
 		main()

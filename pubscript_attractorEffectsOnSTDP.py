@@ -17,8 +17,8 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	"""
 
 	extendedParams = dotmap.DotMap()
-	#extendedParams.neurongroups.outputs.userecovery = [True,False]
-	#extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
+	extendedParams.neurongroups.outputs.userecovery = [True,False]
+	extendedParams.neurongroups.inputs.rate = [ 10 , 15 ] # Hz
 	#extendedParams.neurongroups.outputs.projMult = [ 1.0 , 1.5 , 1.8 ]
 	#extendedParams.neurongroups.outputs.projMult = np.r_[0.2:4.2:0.2]
 	#extendedParams.connectionsets.con1.stdprule.learningrate = 1/32.0 * np.array([0.5 , 1.0 , 2.0]) # eta in Auryn
@@ -28,15 +28,15 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:4.2:0.2]
 	#extendedParams.connectionsets.con1.maximumweight = np.r_[0.2:8.2:0.2]
 	
- 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 ]
+ 	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 ]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = [ 0.0 , 0.025 , 0.05 , 0.075 , 0.1 , 0.2 , 0.3 , 0.4 , 0.5]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.r_[0.0:0.52:0.025]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator = np.linspace(0,1,num=21)
 
-	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = [-0.2 , 0.2]
+	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = [-0.2 , 0.2]
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=21)
-	extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
+	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.linspace(-1,1,num=41)
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.r_[-0.2:0.4:0.1] # 7 values
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator = np.round(np.r_[-0.2:0.4:0.05],3) # 13 values, rounded to 3 digits behind the dot
 
@@ -44,8 +44,10 @@ def define_extended_simulation_parameters(metaparams,baseParams):
 	#extendedParams.connectionsets.con1.stdprule.weightdependence.theMeanSlope = np.linspace(0,1.0,num=21)
 
 	#extendedParams.connectionsets.con1.driftcompensation.stride = np.linspace(0.01,0.07,num=4)
-	#extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.logspace(np.log10(0.0000001), np.log10(0.0001), num=21 ),10)
+	#extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.logspace(np.log10(0.0000001), np.log10(0.0001), num=21 ),8)
 	extendedParams.connectionsets.con1.driftcompensation.stride = np.array([ 0.0 , 0.0001 ])
+	#extendedParams.connectionsets.con1.driftcompensation.stride = np.array([ 0.0 , 0.000001 , 0.00001 , 0.0001 ])
+	#extendedParams.connectionsets.con1.driftcompensation.stride = np.round(np.logspace(np.log10(0.0000001), np.log10(25), num=21 ),8)
 
 	#extendedParams.connectionsets.con1.stdprule.A_plus = [ 0.588 , 0.8 , 0.95 , 1.0 ]
 	#extendedParams.connectionsets.con1.stdprule.A_plus = np.linspace( 0.2, 1.2, num=11)
@@ -222,7 +224,7 @@ def define_meta_parameters(existingSimfoldername=None):
 	metaparams.cache_basename = metaparams.datafig_basename
 	metaparams.figures_path = basefolder+metaparams.datafig_basename+'/figures/'
 	metaparams.figures_basename = metaparams.data_basename
-	metaparams.numRepetitions = 10
+	metaparams.numRepetitions = 2
 	for repetitionID in xrange(metaparams.numRepetitions):
 		metaparams.repetitionFoldernames[repetitionID] = 'repetition_'+str(repetitionID+1)
 	return metaparams
@@ -231,8 +233,9 @@ def define_meta_parameters(existingSimfoldername=None):
 def make_figures(params):
 	try:
 				
-		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
-		figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
+		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.maximumweight', paramdotpathY='neurongroups.outputs.projMult')
+		#figures.all_paramsets.figuretype_TwoParams2D_Accuracy.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
+		figures.all_paramsets.figuretype_TwoParams2D_GrowthImprovements.makeFig(params, paramdotpathX='connectionsets.con1.stdprule.weightdependence.attractorLocationIndicator', paramdotpathY='connectionsets.con1.stdprule.weightdependence.attractorStrengthIndicator')
 
 		if params.baseParams.recordings.detailedtracking:
 			# old: makeFigs(params.allsimparams,params.metaparams)
@@ -266,6 +269,8 @@ def main():
 	#existingSimfoldername = 'sim2016-09-07_trial20'
 	#existingSimfoldername = 'sim2016-09-08_trial1'
 	#existingSimfoldername = 'sim2016-09-12_trial1'
+	#existingSimfoldername = 'sim2017-01-31_trial3'
+	existingSimfoldername = 'from_nemo/sim2017-01-21_trial3'
 	params.metaparams = define_meta_parameters(existingSimfoldername)
 	
 	##### Define simulation settings: ####
@@ -286,10 +291,10 @@ def main():
 	##### Run simulation(s) #####
 	helpers.simulation.run_simulation(params, (existingSimfoldername==None) )
 	
-	#helpers.simulation.rerun_missing_simulations(params)
+	helpers.simulation.rerun_missing_simulations(params)
 	
 	##### Plot results #####
-	#make_figures(params)
+	make_figures(params)
 
 
 if __name__ == "__main__":

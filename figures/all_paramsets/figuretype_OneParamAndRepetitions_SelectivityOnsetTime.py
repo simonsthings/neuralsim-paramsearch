@@ -52,7 +52,7 @@ def makeFig(params, paramdotpath, requestedMinimumDistance = 0.75):
 				__doThePlotting(params, somesimparams, paramGroupString, paramdotpath,figtypename,requestedMinimumDistance)
 
 		else: # all parameter sets can be represented in a single figure:
-			__doThePlotting(params, params.allsimparams, "theOnlyFigure", paramdotpath,figtypename,requestedMinimumDistance)
+			__doThePlotting(params, params.allsimparams, "", paramdotpath,figtypename,requestedMinimumDistance)
 	else:
 		print "Skipping figure generation for param '" + paramdotpath + "' because this parameter was not found among the extended params lists."
 
@@ -88,7 +88,11 @@ def __doThePlotting(params, somesimparams, paramGroupString, paramFullPath, figt
 	__plotFirstOnsetTimes(location3, sufficientSelectivitySpecificityOnsets, theTicks, readableParamString, requestedMinimumDistance, params.baseParams.general.simtime)
 	#__plotROC_projMult(location4, true_positive_rates, false_positive_rates, theTicks, paramFullPath)
 
-	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString + '__requestedDist='+str(requestedMinimumDistance)
+	if paramGroupString:
+		figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString + '__requestedDist='+str(requestedMinimumDistance)
+	else:
+		figName = metaparams.figures_basename + '_' + figBlob + '__theOnlyParams' + '__requestedDist='+str(requestedMinimumDistance)
+
 	figAccuracies.savefig(figPath + figName + '.png')
 	plt.close(figAccuracies)
 

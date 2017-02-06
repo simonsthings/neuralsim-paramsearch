@@ -125,4 +125,30 @@ def fetch_2D_result_data(params, somesimparams, paramdotpathX, paramdotpathY, pa
 		with open(cachePath + cacheName, 'w') as cacheFile:
 			pickle.dump(new_results,cacheFile,protocol=2)  # protocol 2 should be a compressed, binary format.
 		return new_results
-		
+
+
+def fetch_3D_result_data_grouped(params, somesimparams, paramdotpathX, paramdotpathY, paramdotpathZ, paramGroupString='', useCache=True):
+	
+	# split given list of somesimparams into separate list for each entry of paramdotpathZ:
+	groupedParamSets = helpers.parameters.splitByParameter(somesimparams, params.flatParamLists, [paramdotpathZ])
+	
+	threeD_data = {'dim1dim2_datasets':[] , 'dim3_tickvalues':[]}
+	for paramSubGroupString in groupedParamSets.keys():
+		paramSubgroup = groupedParamSets[paramSubGroupString]
+		combinedParamGroupString = helpers.parameters.insertParamStringIntoGroupString(paramGroupString,paramSubGroupString)
+		results_2D = fetch_2D_result_data(params,paramSubgroup,paramdotpathX,paramdotpathY,combinedParamGroupString)
+		threeD_data['dim1dim2_datasets'].append(results_2D)
+
+		tickvalue = helpers.parameters.getParamRecursively(paramdotpathZ, paramSubgroup[0])
+		threeD_data['dim3_tickvalues'].append(tickvalue)
+
+	return threeD_data
+
+
+def fetch_MultiDim_result_data(params, somesimparams, paramdotpathList, paramGroupString='', useCache=True):
+	shortParamStringX = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathList[0])
+	shortParamStringY = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathList[1])
+	shortParamStringZ = helpers.parameters.getDependentParameterShortNameString(params, paramdotpathList[2])
+	
+	raise NotImplementedError
+

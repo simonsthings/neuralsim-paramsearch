@@ -129,19 +129,23 @@ def crossAllParamsets(baseParams, flattenedExtendedParams, allsimparams = []):
 		return allsimparams
 
 def get_formatting_string(oneList):
+	#return _get_formatting_string_new(oneList)
+	return _get_formatting_string_old(oneList)
+
+def _get_formatting_string_new(oneList):
 	# get minimum precision (if oneList consists of numbers)!
 	# Usage: formatString.format(variable)
 	if isinstance(oneList[0], (str, unicode, bool)):
 		formatString = '{:}'
 	else:
-		import decimal
-		
+		# first part:
 		precList = np.abs(np.asarray(oneList))
 		precList = precList[precList != 0]
 		beforeDot = int(np.log10(np.max(precList)))+1
 		
+		# second part:
 		afterDot = 0
-
+		import decimal   # only used here. Therefore don't import at top of this module.
 		for val in oneList:
 			d = decimal.Decimal(str(val))
 			afterDot = np.min([ d.as_tuple().exponent , afterDot])
@@ -149,86 +153,8 @@ def get_formatting_string(oneList):
 		formatString = '{:' + str(beforeDot) + '.' + str(-afterDot) + 'f}'
 	return formatString
 
-def get_formatting_string_goes_too_far_down(oneList):
-	# get minimum precision (if oneList consists of numbers)!
-	# Usage: formatString.format(variable)
-	if isinstance(oneList[0], (str, unicode, bool)):
-		formatString = '{:s}'
-	else:
-		precList = np.abs(np.asarray(oneList))
-		precList = precList[precList != 0]
-		maxMagnitude = 0
-		minScale = 0
-		for precVal in precList:
-			valMagnitude, valScale = _magnitude_and_scale(precVal)
-			print valMagnitude, valScale
-			maxMagnitude = np.max([maxMagnitude,valMagnitude])
-			minScale = np.max([minScale,valScale]) # np.MAX() because scale is given as positive number by _magnitude_and_scale() function.
-
-		precList = np.abs(np.asarray(oneList))
-		precList = precList[precList != 0]
-		minvalprecision = int(np.floor(np.min(np.log10(precList))))
-		maxvalprecision = int(np.ceil(np.max(np.log10(precList))))
-		minFormat = ''
-		maxFormat = ''
-		if minvalprecision < 0:
-			minFormat = str(-minvalprecision)
-		if maxvalprecision > 0:
-			maxFormat = str(maxvalprecision)
-		formatString = '{:'+maxFormat+'.' + minFormat + 'f}'
-	return formatString
-
-def _magnitude_and_scale(x):
-	max_digits = 14
-	int_part = int(abs(x))
-	magnitude = 1 if int_part == 0 else int(np.log10(int_part)) + 1
-	if magnitude >= max_digits:
-		return (magnitude, 0)
-	frac_part = abs(x) - int_part
-	multiplier = 10 ** (max_digits - magnitude)
-	frac_digits = multiplier + int(multiplier * frac_part + 0.5)
-	while frac_digits % 10 == 0:
-		frac_digits /= 10
-	scale = int(np.log10(frac_digits))
-	return (magnitude, scale)
-
-
-
-def get_formatting_string_stillwrong(oneList):
-	# get minimum precision (if oneList consists of numbers)!
-	# Usage: formatString.format(variable)
-	if isinstance(oneList[0], (str, unicode, bool)):
-		formatString = '{:s}'
-	else:
-		
-		precList = np.abs(np.asarray(oneList))
-		precList = precList[precList != 0]
-
-		beforeDot = int(np.log10(np.max(precList)))+1
-		afterDot = 0
-		
-		smallerOneFloatList = set(precList[precList < 1])
-		
-		# get necessary precision by finding how many digits are needed to make resulting number strings unique:
-		tempListIsUnique = False
-		while not tempListIsUnique:
-			formatString = '{:'+str(beforeDot)+'.' + str(afterDot) + 'f}'
-			tempList = []
-			tempListIsUnique = True
-			for val in oneList:
-				strVal = formatString.format(val)
-				if strVal not in tempList:
-					tempList.append(strVal)
-				else:
-					tempListIsUnique = False
-					afterDot += 1
-					break
-	
-		formatString = '{:' + str(beforeDot) + '.' + str(afterDot) + 'f}'
-	return formatString
-
-
-def get_formatting_string_old(oneList):
+# maybe still needed to read old cache files (Before February 2017):
+def _get_formatting_string_old(oneList):
 	# get minimum precision (if oneList consists of numbers)!
 	# Usage: formatString.format(variable)
 	if isinstance(oneList[0], (str, unicode)):
@@ -253,7 +179,7 @@ def asStringList(oneList):
 def splitByParameter(allsimparams,flattenedExtendedParams,paramStringsList):
 	"""
 	This function groups parameter sets for each figure. Each new figure will be referenced by a new dict entry,
-	where the key is a string of the figure name (with also contains any fixed parameter values per figure),
+	where the key is a string of the figure name (which also contains any fixed parameter values per figure),
 	and as value the dict contains a list of parameter sets that should be used to construct each figure.
 	"""
 	if not paramStringsList:
@@ -268,8 +194,8 @@ def splitByParameter(allsimparams,flattenedExtendedParams,paramStringsList):
 		remainingParamStringsList = list(paramStringsList)
 		remainingParamStringsList.remove(oneParamString)
 
-		shortPrarmStringID = oneParamString.rfind('.')
-		shortParamString = oneParamString[shortPrarmStringID + 1:]
+		#shortPrarmStringID = oneParamString.rfind('.')
+		#shortParamString = oneParamString[shortPrarmStringID + 1:]
 
 		perValueSimparams = {}
 
@@ -432,8 +358,17 @@ def getReadableParamString(params,paramdotpath):
 	return readableParamString
 
 
-
-
-
-
+def insertParamStringIntoGroupString(paramGroupString, paramSubGroupString):
+	""" One-liner not possible? So I split this up and made a function.
+	This breaks apart the params string on the '_' separator, and inserts the new
+	paramString at the proper position (so that cache files are unique). """
+	if paramGroupString:
+		tempList = paramGroupString.split('_')
+		tempList.append(paramSubGroupString)
+		tempList = sorted(tempList)
+		combinedParamGroupString = '_'.join(tempList)
+		return combinedParamGroupString
+	else:
+		return paramSubGroupString
+	#return paramSubGroupString + '_' + paramGroupString
 

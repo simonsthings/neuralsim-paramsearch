@@ -52,7 +52,7 @@ def makeFig(params, paramdotpath):
 				__doThePlotting(params, somesimparams, paramGroupString, paramdotpath,figtypename)
 
 		else: # all parameter sets can be represented in a single figure:
-			__doThePlotting(params, params.allsimparams, "theOnlyFigure", paramdotpath,figtypename)
+			__doThePlotting(params, params.allsimparams, "", paramdotpath,figtypename)
 	else:
 		print "Skipping figure generation for param '" + paramdotpath + "' because this parameter was not found among the extended params lists."
 
@@ -86,7 +86,11 @@ def __doThePlotting(params, somesimparams, paramGroupString, paramFullPath, figt
 	__plotTPRvsFPR_projMult(location3, true_positive_rates, false_positive_rates, theTicks, paramFullPath,readableParamString)
 	__plotROC_projMult(location4, true_positive_rates, false_positive_rates, theTicks, paramFullPath)
 	
-	figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
+	if paramGroupString:
+		figName = metaparams.figures_basename + '_' + figBlob + '__' + paramGroupString
+	else:
+		figName = metaparams.figures_basename + '_' + figBlob + '__theOnlyFigure'
+
 	figAccuracies.savefig(figPath + figName + '.png')
 	plt.close(figAccuracies)
 
